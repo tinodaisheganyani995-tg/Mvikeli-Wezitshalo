@@ -1,6 +1,4 @@
 Flask
-torch
-torchvision
 numpy
 Pillow
 Werkzeug
