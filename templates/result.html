@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Prediction Result | Mvikeli Wezitshalo</title>
+
+    <!-- Result Page CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/result.css') }}">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         NAVIGATION BAR
+    ========================== -->
+
+    <nav class="navbar">
+
+        <div class="nav-logo">
+
+            <i class="fa-solid fa-seedling"></i>
+
+            <span>Mvikeli Wezitshalo</span>
+
+        </div>
+
+
+        <a href="/" class="back-home">
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+            Back Home
+
+        </a>
+
+    </nav>
+
+
+
+    <!-- =========================
+         MAIN RESULT SECTION
+    ========================== -->
+
+    <main class="result-section">
+
+        <div class="result-container">
+
+
+            <!-- =========================
+                 RESULT HEADING
+            ========================== -->
+
+            <div class="result-heading">
+
+                <span class="result-tag">
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                    AI Analysis Complete
+
+                </span>
+
+
+                <h1>
+
+                    Plant Disease
+
+                    <span>Detection Result</span>
+
+                </h1>
+
+
+                <p>
+
+                    Our AI model has analyzed your uploaded
+                    tomato plant image and generated the result below.
+
+                </p>
+
+            </div>
+
+
+
+            <!-- =========================
+                 MAIN RESULT CARD
+            ========================== -->
+
+            <div class="result-card">
+
+
+                <!-- =========================
+                     UPLOADED IMAGE
+                ========================== -->
+
+                <div class="result-image-section">
+
+                    <div class="image-title">
+
+                        <i class="fa-solid fa-image"></i>
+
+                        Uploaded Image
+
+                    </div>
+
+
+                    <div class="result-image">
+
+                        <img
+                            src="{{ url_for('static', filename=image.replace('\\', '/').replace('static/', '')) }}"
+                            alt="Uploaded tomato plant image"
+                        >
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =========================
+                     RESULT INFORMATION
+                ========================== -->
+
+                <div class="result-information">
+
+
+                    <!-- ICON -->
+
+                    <div class="result-icon">
+
+                        <i class="fa-solid fa-leaf"></i>
+
+                    </div>
+
+
+
+                    <!-- LABEL -->
+
+                    <span class="prediction-label">
+
+                        Detected Condition
+
+                    </span>
+
+
+
+                    <!-- DISEASE NAME -->
+
+                    <h2 class="disease-name">
+
+                        {{ prediction }}
+
+                    </h2>
+
+
+
+                    <!-- =========================
+                         CONFIDENCE
+                    ========================== -->
+
+                    <div class="confidence-box">
+
+                        <div class="confidence-top">
+
+                            <span>
+
+                                AI Confidence
+
+                            </span>
+
+
+                            <strong>
+
+                                {{ "%.2f"|format(confidence) }}%
+
+                            </strong>
+
+                        </div>
+
+
+                        <div class="confidence-bar">
+
+                            <div
+                                class="confidence-progress"
+                                style="--progress: {{ confidence }}%;"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =========================
+                         DESCRIPTION
+                    ========================== -->
+
+                    <div class="disease-information">
+
+                        <h3>
+
+                            <i class="fa-solid fa-circle-info"></i>
+
+                            About This Condition
+
+                        </h3>
+
+
+                        <p>
+
+                            {{ description }}
+
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- =========================
+                         SYMPTOMS
+                    ========================== -->
+
+                    <div class="result-details">
+
+                        <h3>
+
+                            <i class="fa-solid fa-notes-medical"></i>
+
+                            Symptoms
+
+                        </h3>
+
+
+                        <ul>
+
+                            {% for symptom in symptoms %}
+
+                            <li>
+
+                                <i class="fa-solid fa-check"></i>
+
+                                <span>
+
+                                    {{ symptom }}
+
+                                </span>
+
+                            </li>
+
+                            {% endfor %}
+
+                        </ul>
+
+                    </div>
+
+
+
+                    <!-- =========================
+                         TREATMENT
+                    ========================== -->
+
+                    <div class="result-details">
+
+                        <h3>
+
+                            <i class="fa-solid fa-kit-medical"></i>
+
+                            Recommended Treatment
+
+                        </h3>
+
+
+                        <ul>
+
+                            {% for item in treatment %}
+
+                            <li>
+
+                                <i class="fa-solid fa-check"></i>
+
+                                <span>
+
+                                    {{ item }}
+
+                                </span>
+
+                            </li>
+
+                            {% endfor %}
+
+                        </ul>
+
+                    </div>
+
+
+
+                    <!-- =========================
+                         PREVENTION
+                    ========================== -->
+
+                    <div class="result-details">
+
+                        <h3>
+
+                            <i class="fa-solid fa-shield-heart"></i>
+
+                            Prevention
+
+                        </h3>
+
+
+                        <ul>
+
+                            {% for item in prevention %}
+
+                            <li>
+
+                                <i class="fa-solid fa-check"></i>
+
+                                <span>
+
+                                    {{ item }}
+
+                                </span>
+
+                            </li>
+
+                            {% endfor %}
+
+                        </ul>
+
+                    </div>
+
+
+
+                    <!-- =========================
+                         ACTION BUTTONS
+                    ========================== -->
+
+                    <div class="result-actions">
+
+
+                        <a href="/"
+                           class="result-button secondary">
+
+                            <i class="fa-solid fa-rotate-left"></i>
+
+                            Analyze Another Image
+
+                        </a>
+
+
+                        <a href="/download"
+                           class="result-button primary">
+
+                            <i class="fa-solid fa-file-pdf"></i>
+
+                            Download Report
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =========================
+                 TOP 3 PREDICTIONS
+            ========================== -->
+
+            <section class="top3-section">
+
+
+                <div class="top3-heading">
+
+
+                    <span class="result-tag">
+
+                        <i class="fa-solid fa-chart-column"></i>
+
+                        AI Prediction Details
+
+                    </span>
+
+
+                    <h2>
+
+                        Top Predictions
+
+                    </h2>
+
+
+                    <p>
+
+                        These are the three conditions with the
+                        highest prediction probabilities.
+
+                    </p>
+
+                </div>
+
+
+
+                <!-- =========================
+                     TOP 3 GRID
+                ========================== -->
+
+                <div class="top3-grid">
+
+
+                    {% for item in top3 %}
+
+
+                    <div class="top3-card">
+
+
+                        <!-- RANK -->
+
+                        <div class="top3-rank">
+
+                            {{ loop.index }}
+
+                        </div>
+
+
+
+                        <!-- CONTENT -->
+
+                        <div class="top3-content">
+
+
+                            <h3>
+
+                                {{ item.name }}
+
+                            </h3>
+
+
+                            <div class="top3-confidence">
+
+                                <span>
+
+                                    Confidence
+
+                                </span>
+
+
+                                <strong>
+
+                                    {{ "%.2f"|format(item.confidence) }}%
+
+                                </strong>
+
+                            </div>
+
+
+                            <div class="top3-bar">
+
+                                <div
+                                    class="top3-progress"
+                                    style="--progress: {{ item.confidence }}%;"
+                                ></div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {% endfor %}
+
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =========================
+                 IMPORTANT NOTICE
+            ========================== -->
+
+            <div class="result-notice">
+
+
+                <div class="notice-icon">
+
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+
+                </div>
+
+
+                <div>
+
+                    <h3>
+
+                        Important Note
+
+                    </h3>
+
+
+                    <p>
+
+                        This AI result is intended to assist with
+                        plant disease identification. For accurate
+                        diagnosis and treatment decisions, consider
+                        consulting an agricultural expert.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <footer class="result-footer">
+
+
+        <div class="result-footer-content">
+
+
+            <div class="result-footer-logo">
+
+                <i class="fa-solid fa-seedling"></i>
+
+                <span>
+
+                    Mvikeli Wezitshalo
+
+                </span>
+
+            </div>
+
+
+            <p>
+
+                AI-powered tomato plant disease detection.
+
+            </p>
+
+
+            <small>
+
+                © 2026 Mvikeli Wezitshalo. All rights reserved.
+
+            </small>
+
+        </div>
+
+    </footer>
+
+
+</body>
+
+</html>
