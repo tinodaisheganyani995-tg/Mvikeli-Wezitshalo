@@ -1,0 +1,1361 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mvikeli Wezitshalo | Plant Disease Recognition</title>
+
+    <!-- FONT AWESOME -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- YOUR CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================
+         NAVBAR
+    ========================================== -->
+
+    <nav class="navbar">
+
+        <div class="nav-logo">
+
+            <i class="fa-solid fa-seedling"></i>
+
+            <span>
+                Mvikeli Wezitshalo
+            </span>
+
+        </div>
+
+
+        <!-- HAMBURGER -->
+
+        <button
+            class="menu-toggle"
+            id="menu-toggle"
+            type="button"
+            aria-label="Open menu">
+
+            <i class="fa-solid fa-bars"></i>
+
+        </button>
+
+
+        <!-- NAVIGATION -->
+
+        <ul class="nav-links" id="nav-links">
+
+            <li>
+                <a href="#home">
+                    Home
+                </a>
+            </li>
+
+            <li>
+                <a href="#detect">
+                    Detection
+                </a>
+            </li>
+
+            <li>
+                <a href="#about">
+                    About
+                </a>
+            </li>
+
+            <li class="mobile-button-item">
+
+                <a href="#detect" class="nav-button">
+                    Start Detection
+                </a>
+
+            </li>
+
+        </ul>
+
+    </nav>
+
+
+
+    <!-- =========================================
+         HERO SECTION
+    ========================================== -->
+
+    <section class="hero" id="home">
+
+        <div class="hero-content">
+
+
+            <!-- HERO TEXT -->
+
+            <div class="hero-text">
+
+                <span class="hero-tag">
+
+                    <i class="fa-solid fa-leaf"></i>
+
+                    AI-Powered Plant Protection
+
+                </span>
+
+
+                <h1>
+
+                    Protect Your
+
+                    <span>
+                        Tomato Plants
+                    </span>
+
+                    With AI
+
+                </h1>
+
+
+                <p>
+
+                    Detect tomato plant diseases quickly using
+                    artificial intelligence and get useful information
+                    to help protect your crops.
+
+                </p>
+
+
+                <div class="hero-buttons">
+
+                    <a href="#detect"
+                       class="hero-primary-btn">
+
+                        <i class="fa-solid fa-camera"></i>
+
+                        Start Detection
+
+                    </a>
+
+
+                    <a href="#about"
+                       class="hero-secondary-btn">
+
+                        Learn More
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- HERO VISUAL -->
+
+            <div class="hero-visual">
+
+                <div class="hero-image-card">
+
+                    <div class="hero-icon">
+
+                        <i class="fa-solid fa-seedling"></i>
+
+                    </div>
+
+
+                    <h3>
+                        Healthy Plants
+                    </h3>
+
+
+                    <p>
+
+                        Early detection can help farmers
+                        protect their tomato crops.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================================
+         DISEASE DETECTION SECTION
+    ========================================== -->
+
+    <section class="detection-section" id="detect">
+
+        <div class="detection-container">
+
+
+            <!-- SECTION HEADING -->
+
+            <div class="detection-heading">
+
+                <span class="section-tag">
+
+                    <i class="fa-solid fa-microscope"></i>
+
+                    AI Disease Detection
+
+                </span>
+
+
+                <h2>
+
+                    Detect Tomato Plant
+
+                    <span>
+                        Diseases Early
+                    </span>
+
+                </h2>
+
+
+                <p>
+
+                    Upload a clear image of your tomato plant
+                    and let our AI model analyze it for possible diseases.
+
+                </p>
+
+            </div>
+
+
+
+            <!-- DETECTION CARD -->
+
+            <div class="detection-card">
+
+
+                
+
+   
+
+ <!-- =====================================
+     LEFT SIDE — IMAGE UPLOAD
+====================================== -->
+
+                     <div class="upload-area">
+
+    <div class="upload-icon">
+
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+
+    </div>
+
+
+    <h3>
+        Upload Your Plant Image
+    </h3>
+
+
+    <p>
+
+        Take a photo of your tomato leaf or
+        choose an existing image from your device.
+
+    </p>
+
+
+
+    <!-- =====================================
+         PREDICTION FORM
+    ====================================== -->
+
+    <form
+        id="prediction-form"
+        action="/predict"
+        method="POST"
+        enctype="multipart/form-data">
+
+
+        <!-- IMAGE OPTIONS -->
+<!-- IMAGE OPTIONS -->
+
+<div class="upload-options">
+
+    <!-- TAKE PHOTO -->
+
+    <button
+        type="button"
+        id="take-photo-button"
+        class="upload-button camera-button">
+
+        <i class="fa-solid fa-camera"></i>
+
+        Take Photo
+
+    </button>
+
+
+    <!-- CAMERA INPUT -->
+
+    <input
+        type="file"
+        id="camera-image"
+        accept="image/*"
+        hidden>
+
+
+    <!-- CHOOSE IMAGE -->
+
+    <button
+        type="button"
+        id="choose-image-button"
+        class="upload-button choose-button">
+
+        <i class="fa-solid fa-folder-open"></i>
+
+        Choose Image
+
+    </button>
+
+
+    <!-- MAIN IMAGE INPUT
+         Flask receives this as "image" -->
+
+    <input
+        type="file"
+        id="plant-image"
+        name="image"
+        accept="image/*"
+        hidden>
+
+</div>
+
+
+
+        <!-- =====================================
+             IMAGE PREVIEW
+        ====================================== -->
+
+        <div
+            id="selected-image-area"
+            class="selected-image-area">
+
+            <img
+                id="image-preview"
+                src=""
+                alt="Selected tomato plant image">
+
+        </div>
+
+
+
+        <!-- FILE TYPES -->
+
+        <small>
+
+            JPG, JPEG or PNG
+
+        </small>
+
+
+
+        <!-- =====================================
+             ANALYZE BUTTON
+        ====================================== -->
+
+        <button
+            type="submit"
+            id="predict-button"
+            class="predict-button">
+
+            <i class="fa-solid fa-microscope"></i>
+
+            Analyze Image
+
+        </button>
+
+
+    </form>
+
+                 </div>
+
+
+
+                <!-- =====================================
+                     RIGHT SIDE — AI INFORMATION
+                ====================================== -->
+
+                <div class="detection-info">
+
+
+                    <div class="info-icon">
+
+                        <i class="fa-solid fa-brain"></i>
+
+                    </div>
+
+
+                    <h3>
+                        AI-Powered Analysis
+                    </h3>
+
+
+                    <p>
+
+                        Our trained artificial intelligence model
+                        analyzes the uploaded image and identifies
+                        the most likely tomato plant disease.
+
+                    </p>
+
+
+
+                    <!-- DETECTION STEPS -->
+
+                    <div class="detection-steps">
+
+
+                        <!-- STEP 01 -->
+
+                        <div class="step">
+
+                            <span>
+                                01
+                            </span>
+
+                            <div>
+
+                                <h4>
+                                    Take or Upload
+                                </h4>
+
+                                <p>
+                                    Take a photo or choose a tomato leaf image.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- STEP 02 -->
+
+                        <div class="step">
+
+                            <span>
+                                02
+                            </span>
+
+                            <div>
+
+                                <h4>
+                                    Analyze
+                                </h4>
+
+                                <p>
+                                    AI examines the plant image.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- STEP 03 -->
+
+                        <div class="step">
+
+                            <span>
+                                03
+                            </span>
+
+                            <div>
+
+                                <h4>
+                                    Get Result
+                                </h4>
+
+                                <p>
+                                    Receive the detected disease.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================================
+         ABOUT SECTION
+    ========================================== -->
+
+    <section class="about-section" id="about">
+
+        <div class="about-container">
+
+
+            <!-- HEADING -->
+
+            <div class="about-heading">
+
+                <span class="section-tag">
+
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    About Mvikeli Wezitshalo
+
+                </span>
+
+
+                <h2>
+
+                    Smart Technology for
+
+                    <span>
+                        Healthier Crops
+                    </span>
+
+                </h2>
+
+
+                <p>
+
+                    Mvikeli Wezitshalo uses artificial intelligence
+                    to help identify common tomato plant diseases
+                    from leaf images.
+
+                </p>
+
+            </div>
+
+
+
+            <!-- ABOUT CONTENT -->
+
+            <div class="about-content">
+
+
+                <!-- LEFT -->
+
+                <div class="about-text">
+
+                    <h3>
+                        Helping Farmers Detect Plant Diseases Earlier
+                    </h3>
+
+
+                    <p>
+
+                        Plant diseases can spread quickly and affect
+                        tomato production. Early identification can
+                        help farmers understand what may be affecting
+                        their crops and take appropriate action.
+
+                    </p>
+
+
+                    <p>
+
+                        Mvikeli Wezitshalo provides an easy-to-use
+                        AI-powered platform where a tomato leaf image
+                        can be uploaded and analyzed by a trained
+                        machine learning model.
+
+                    </p>
+
+
+
+                    <!-- FEATURES -->
+
+                    <div class="about-features">
+
+
+                        <div class="about-feature">
+
+                            <div class="feature-icon">
+
+                                <i class="fa-solid fa-bolt"></i>
+
+                            </div>
+
+                            <div>
+
+                                <h4>
+                                    Fast Detection
+                                </h4>
+
+                                <p>
+                                    Analyze a plant image quickly.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="about-feature">
+
+                            <div class="feature-icon">
+
+                                <i class="fa-solid fa-brain"></i>
+
+                            </div>
+
+                            <div>
+
+                                <h4>
+                                    AI Powered
+                                </h4>
+
+                                <p>
+                                    Uses a trained AI model for analysis.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="about-feature">
+
+                            <div class="feature-icon">
+
+                                <i class="fa-solid fa-leaf"></i>
+
+                            </div>
+
+                            <div>
+
+                                <h4>
+                                    Crop Focused
+                                </h4>
+
+                                <p>
+                                    Designed specifically for tomato plants.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="about-feature">
+
+                            <div class="feature-icon">
+
+                                <i class="fa-solid fa-mobile-screen-button"></i>
+
+                            </div>
+
+                            <div>
+
+                                <h4>
+                                    Easy to Use
+                                </h4>
+
+                                <p>
+                                    Simple interface for quick image uploads.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- RIGHT -->
+
+                <div class="about-visual">
+
+                    <div class="about-card">
+
+
+                        <div class="about-card-icon">
+
+                            <i class="fa-solid fa-seedling"></i>
+
+                        </div>
+
+
+                        <span class="about-card-label">
+
+                            AI Plant Protection
+
+                        </span>
+
+
+                        <h3>
+
+                            Protecting Tomato
+
+                            <span>
+                                Crops With AI
+                            </span>
+
+                        </h3>
+
+
+                        <p>
+
+                            Upload a leaf image and let artificial
+                            intelligence assist with disease identification.
+
+                        </p>
+
+
+
+                        <div class="about-stat">
+
+                            <div class="stat-icon">
+
+                                <i class="fa-solid fa-microscope"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+                                    AI Analysis
+                                </strong>
+
+                                <small>
+                                    Image-based disease detection
+                                </small>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================================
+         HOW IT WORKS
+    ========================================== -->
+
+    <section class="how-section" id="how-it-works">
+
+        <div class="how-container">
+
+
+            <div class="how-heading">
+
+                <span class="section-tag">
+
+                    <i class="fa-solid fa-route"></i>
+
+                    How It Works
+
+                </span>
+
+
+                <h2>
+
+                    Detect Plant Diseases
+
+                    <span>
+                        In Three Simple Steps
+                    </span>
+
+                </h2>
+
+
+                <p>
+
+                    Mvikeli Wezitshalo makes plant disease detection
+                    simple, fast, and accessible.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="how-steps">
+
+
+                <!-- STEP 01 -->
+
+                <div class="how-step">
+
+                    <div class="how-step-number">
+                        01
+                    </div>
+
+                    <div class="how-step-icon">
+
+                        <i class="fa-solid fa-camera"></i>
+
+                    </div>
+
+                    <h3>
+                        Take or Upload
+                    </h3>
+
+                    <p>
+
+                        Take a clear photo of a tomato leaf using
+                        your camera or choose an existing image.
+
+                    </p>
+
+                </div>
+
+
+
+                <!-- CONNECTOR -->
+
+                <div class="how-connector">
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </div>
+
+
+
+                <!-- STEP 02 -->
+
+                <div class="how-step">
+
+                    <div class="how-step-number">
+                        02
+                    </div>
+
+                    <div class="how-step-icon">
+
+                        <i class="fa-solid fa-brain"></i>
+
+                    </div>
+
+                    <h3>
+                        AI Analysis
+                    </h3>
+
+                    <p>
+
+                        Our trained AI model analyzes the image
+                        and looks for signs of tomato plant disease.
+
+                    </p>
+
+                </div>
+
+
+
+                <!-- CONNECTOR -->
+
+                <div class="how-connector">
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </div>
+
+
+
+                <!-- STEP 03 -->
+
+                <div class="how-step">
+
+                    <div class="how-step-number">
+                        03
+                    </div>
+
+                    <div class="how-step-icon">
+
+                        <i class="fa-solid fa-square-poll-vertical"></i>
+
+                    </div>
+
+                    <h3>
+                        Get Your Result
+                    </h3>
+
+                    <p>
+
+                        View the predicted disease and useful
+                        information about the detected condition.
+
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================================
+         DISEASE INFORMATION
+    ========================================== -->
+
+    <section class="disease-section" id="diseases">
+
+        <div class="disease-container">
+
+
+            <div class="disease-heading">
+
+                <span class="section-tag">
+
+                    <i class="fa-solid fa-leaf"></i>
+
+                    Tomato Plant Diseases
+
+                </span>
+
+
+                <h2>
+
+                    Know the Signs,
+
+                    <span>
+                        Protect Your Plants
+                    </span>
+
+                </h2>
+
+
+                <p>
+
+                    Learn about common tomato plant diseases
+                    that can affect the health and productivity of your crops.
+
+                </p>
+
+            </div>
+
+
+
+            <!-- DISEASE CARDS -->
+
+            <div class="disease-grid">
+
+
+                <!-- EARLY BLIGHT -->
+
+                <div class="disease-card">
+
+                    <div class="disease-card-icon">
+
+                        <i class="fa-solid fa-virus"></i>
+
+                    </div>
+
+
+                    <span class="disease-status">
+                        Common Disease
+                    </span>
+
+
+                    <h3>
+                        Early Blight
+                    </h3>
+
+
+                    <p>
+
+                        A fungal disease that can cause dark spots
+                        and damage on tomato leaves.
+
+                    </p>
+
+
+                    <div class="disease-link">
+
+                        Learn More
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- LATE BLIGHT -->
+
+                <div class="disease-card">
+
+                    <div class="disease-card-icon">
+
+                        <i class="fa-solid fa-virus"></i>
+
+                    </div>
+
+
+                    <span class="disease-status">
+                        Common Disease
+                    </span>
+
+
+                    <h3>
+                        Late Blight
+                    </h3>
+
+
+                    <p>
+
+                        A serious plant disease that can spread quickly
+                        under suitable environmental conditions.
+
+                    </p>
+
+
+                    <div class="disease-link">
+
+                        Learn More
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- BACTERIAL SPOT -->
+
+                <div class="disease-card">
+
+                    <div class="disease-card-icon">
+
+                        <i class="fa-solid fa-bacteria"></i>
+
+                    </div>
+
+
+                    <span class="disease-status">
+                        Plant Disease
+                    </span>
+
+
+                    <h3>
+                        Bacterial Spot
+                    </h3>
+
+
+                    <p>
+
+                        A bacterial disease that can produce small
+                        dark spots on tomato leaves and fruit.
+
+                    </p>
+
+
+                    <div class="disease-link">
+
+                        Learn More
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- HEALTHY -->
+
+                <div class="disease-card">
+
+                    <div class="disease-card-icon">
+
+                        <i class="fa-solid fa-seedling"></i>
+
+                    </div>
+
+
+                    <span class="disease-status">
+                        Healthy Plant
+                    </span>
+
+
+                    <h3>
+                        Healthy Tomato
+                    </h3>
+
+
+                    <p>
+
+                        Healthy leaves generally have a strong green
+                        appearance without significant disease symptoms.
+
+                    </p>
+
+
+                    <div class="disease-link">
+
+                        View Details
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================================
+         FOOTER
+    ========================================== -->
+
+    <footer class="footer">
+
+        <div class="footer-container">
+
+
+            <!-- BRAND -->
+
+            <div class="footer-brand">
+
+                <div class="footer-logo">
+
+                    <i class="fa-solid fa-seedling"></i>
+
+                    <span>
+                        Mvikeli Wezitshalo
+                    </span>
+
+                </div>
+
+
+                <p>
+
+                    An AI-powered platform designed to help
+                    identify tomato plant diseases from leaf images
+                    and support healthier crops.
+
+                </p>
+
+
+                <div class="footer-ai-badge">
+
+                    <i class="fa-solid fa-brain"></i>
+
+                    AI-Powered Plant Protection
+
+                </div>
+
+            </div>
+
+
+
+            <!-- QUICK LINKS -->
+
+            <div class="footer-column">
+
+                <h3>
+                    Quick Links
+                </h3>
+
+
+                <ul>
+
+                    <li>
+                        <a href="#home">
+                            Home
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#detect">
+                            Detection
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#about">
+                            About
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#how-it-works">
+                            How It Works
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#diseases">
+                            Diseases
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+
+            <!-- PLATFORM -->
+
+            <div class="footer-column">
+
+                <h3>
+                    Platform
+                </h3>
+
+
+                <ul>
+
+                    <li>
+                        <a href="#detect">
+                            AI Detection
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#diseases">
+                            Plant Diseases
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#how-it-works">
+                            How It Works
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#about">
+                            About Project
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+
+            <!-- START DETECTION -->
+
+            <div class="footer-column footer-action">
+
+                <h3>
+                    Protect Your Crops
+                </h3>
+
+
+                <p>
+
+                    Upload a tomato leaf image and
+                    let our AI model analyze it.
+
+                </p>
+
+
+                <a href="#detect"
+                   class="footer-button">
+
+                    <i class="fa-solid fa-camera"></i>
+
+                    Start Detection
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- FOOTER BOTTOM -->
+
+        <div class="footer-bottom">
+
+            <div class="footer-bottom-content">
+
+                <p>
+
+                    © 2026 Mvikeli Wezitshalo.
+                    All rights reserved.
+
+                </p>
+
+
+                <p class="footer-made">
+
+                    Built with
+
+                    <i class="fa-solid fa-heart"></i>
+
+                    using html, css, javascript, python, flask,
+                    and machine learning.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+
+    <!-- =========================================
+         JAVASCRIPT
+    ========================================== -->
+
+    <script
+        src="{{ url_for('static', filename='js/script.js') }}">
+    </script>
+
+
+</body>
+
+</html>
+```

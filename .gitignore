@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+
+static/uploads/*
+
+train/
+tomatoDisease2_split/
+gate_keeper/
+gate_keeper_binary/
+
+flask/
+
+*.ipynb_checkpoints/
+
+.env
+venv/
+.venv/

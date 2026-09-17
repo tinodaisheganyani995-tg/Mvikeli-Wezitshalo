@@ -1,0 +1,3927 @@
+/* =========================================
+   RESET
+========================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   BODY
+========================================= */
+
+body {
+    font-family: Arial, sans-serif;
+    background: white;
+}
+
+
+/* =========================================
+   NAVBAR - DESKTOP
+========================================= */
+
+.navbar {
+    width: 90%;
+    max-width: 1400px;
+
+    min-height: 70px;
+
+    margin: 15px auto;
+    padding: 0 30px;
+
+    display: flex;
+    align-items: center;
+
+    background: rgba(255, 255, 255, 0.96);
+
+    border: 1px solid #DDEBE2;
+    border-radius: 16px;
+
+    box-shadow:
+        0 4px 15px rgba(11, 93, 59, 0.07),
+        0 10px 30px rgba(11, 93, 59, 0.06);
+
+    position: sticky;
+    top: 15px;
+
+    z-index: 1000;
+
+    transition: all 0.3s ease;
+}
+
+
+/* =========================================
+   NAVBAR HOVER
+========================================= */
+
+.navbar:hover {
+    box-shadow:
+        0 6px 20px rgba(11, 93, 59, 0.10),
+        0 15px 35px rgba(11, 93, 59, 0.08);
+}
+
+
+/* =========================================
+   LOGO
+========================================= */
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    color: #0B5D3B;
+
+    font-size: 22px;
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    transition: color 0.3s ease;
+}
+
+
+.nav-logo i {
+    font-size: 26px;
+
+    background: linear-gradient(
+        135deg,
+        #0B5D3B,
+        #2E9E5B
+    );
+
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    transition: transform 0.3s ease;
+}
+
+
+/* Logo hover */
+
+.nav-logo:hover {
+    color: #087F5B;
+}
+
+
+.nav-logo:hover i {
+    transform: rotate(-8deg) scale(1.08);
+}
+
+
+/* =========================================
+   NAVIGATION LINKS - DESKTOP
+========================================= */
+
+.nav-links {
+    display: flex;
+    align-items: center;
+
+    gap: 32px;
+
+    list-style: none;
+
+    margin-left: auto;
+    margin-right: 25px;
+
+    padding: 0;
+}
+
+
+.nav-links li {
+    list-style: none;
+}
+
+
+/* =========================================
+   NORMAL NAVIGATION LINKS
+========================================= */
+
+.nav-links li:not(.mobile-button-item) a {
+
+    position: relative;
+
+    text-decoration: none;
+
+    color: #17221B;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    padding: 8px 2px;
+
+    transition:
+        color 0.3s ease,
+        transform 0.3s ease;
+}
+
+
+/* =========================================
+   DESKTOP UNDERLINE
+========================================= */
+
+.nav-links li:not(.mobile-button-item) a::after {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    bottom: 2px;
+
+    width: 0;
+    height: 2px;
+
+    background: linear-gradient(
+        90deg,
+        #0B5D3B,
+        #2E9E5B
+    );
+
+    border-radius: 10px;
+
+    transition: width 0.3s ease;
+}
+
+
+/* Desktop hover */
+
+.nav-links li:not(.mobile-button-item) a:hover {
+
+    color: #0B5D3B;
+}
+
+
+/* Desktop underline animation */
+
+.nav-links li:not(.mobile-button-item) a:hover::after {
+
+    width: 100%;
+}
+
+
+/* =========================================
+   START DETECTION BUTTON
+========================================= */
+
+.nav-button {
+
+    display: block;
+
+    width: auto;
+    min-width: 125px;
+
+    padding: 12px 18px;
+
+    text-align: center;
+
+    text-decoration: none;
+
+    background: linear-gradient(
+        135deg,
+        #0B5D3B,
+        #087F5B
+    );
+
+    color: #FFFFFF !important;
+
+    border-radius: 9px;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    box-shadow:
+        0 5px 12px rgba(11, 93, 59, 0.20);
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
+        background 0.3s ease;
+}
+
+
+/* Button hover */
+
+.nav-button:hover {
+
+    background: linear-gradient(
+        135deg,
+        #087F5B,
+        #2E9E5B
+    );
+
+    color: #FFFFFF !important;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 18px rgba(11, 93, 59, 0.28);
+}
+
+
+/* Button click */
+
+.nav-button:active {
+    transform: translateY(0);
+}
+
+
+/* Never show underline on button */
+
+.nav-button::after {
+    display: none !important;
+}
+
+
+/* =========================================
+   START DETECTION ITEM
+========================================= */
+
+.mobile-button-item {
+    display: block;
+}
+
+
+/* =========================================
+   HAMBURGER
+========================================= */
+
+.menu-toggle {
+
+    display: none;
+
+    background: none;
+
+    border: none;
+
+    font-size: 25px;
+
+    color: #0B5D3B;
+
+    cursor: pointer;
+
+    z-index: 1200;
+
+    transition:
+        color 0.3s ease,
+        transform 0.3s ease;
+}
+
+
+.menu-toggle:hover {
+
+    color: #087F5B;
+
+    transform: scale(1.08);
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 1000px) {
+
+    .navbar {
+
+        width: 94%;
+
+        padding: 0 20px;
+    }
+
+
+    /* Logo */
+
+    .nav-logo {
+        font-size: 20px;
+    }
+
+
+    .nav-logo i {
+        font-size: 24px;
+    }
+
+
+    /* Links */
+
+    .nav-links {
+
+        gap: 22px;
+
+        margin-right: 18px;
+    }
+
+
+    .nav-links a {
+        font-size: 15px;
+    }
+
+
+    /* Button */
+
+    .nav-button {
+
+        width: 115px;
+
+        font-size: 14px;
+    }
+}
+
+
+/* =========================================
+   MOBILE
+   RIGHT SIDE DRAWER
+========================================= */
+
+@media (max-width: 750px) {
+
+
+    /* =====================================
+       NAVBAR
+    ===================================== */
+
+    .navbar {
+
+        width: 94%;
+
+        min-height: 65px;
+
+        padding: 0 20px;
+
+        margin: 10px auto;
+
+        top: 10px;
+
+        border-radius: 14px;
+
+        box-shadow:
+            0 4px 15px rgba(11, 93, 59, 0.08),
+            0 8px 25px rgba(11, 93, 59, 0.06);
+    }
+
+
+    /* =====================================
+       LOGO
+    ===================================== */
+
+    .nav-logo {
+
+        font-size: 19px;
+    }
+
+
+    .nav-logo i {
+
+        font-size: 23px;
+    }
+
+
+    /* =====================================
+       HAMBURGER
+    ===================================== */
+
+    .menu-toggle {
+
+        display: block;
+
+        margin-left: auto;
+
+        font-size: 25px;
+
+        background: none;
+
+        border: none;
+
+        color: #0B5D3B;
+
+        cursor: pointer;
+
+        z-index: 1200;
+
+        transition:
+            color 0.3s ease,
+            transform 0.3s ease;
+    }
+
+
+    .menu-toggle:hover {
+
+        color: #087F5B;
+
+        transform: scale(1.08);
+    }
+
+
+    /* =====================================
+       RIGHT SIDE DRAWER
+    ===================================== */
+
+    .nav-links {
+
+        position: fixed;
+
+        top: 0;
+
+        right: -300px;
+
+        width: 200px;
+
+        height: 100vh;
+
+        margin: 0;
+
+        padding: 100px 30px 30px;
+
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 25px;
+
+        background: rgba(255, 255, 255, 0.98);
+
+        border-left: 1px solid #DDEBE2;
+
+        box-shadow:
+            -10px 0 30px rgba(11, 93, 59, 0.12),
+            -20px 0 50px rgba(11, 93, 59, 0.06);
+
+        transition: right 0.35s ease;
+
+        z-index: 1050;
+    }
+
+
+    /* =====================================
+       OPEN DRAWER
+    ===================================== */
+
+    .nav-links.active {
+
+        right: 0;
+    }
+
+
+    /* =====================================
+       MOBILE NAV ITEMS
+    ===================================== */
+
+    .nav-links li {
+
+        width: 100%;
+    }
+
+
+    /* =====================================
+       MOBILE LINKS
+    ===================================== */
+
+    .nav-links li:not(.mobile-button-item) a {
+
+        position: relative;
+
+        display: inline-block;
+
+        width: auto;
+
+        padding: 12px 5px;
+
+        font-size: 17px;
+
+        color: #17221B;
+
+        text-decoration: none;
+
+        transition:
+            color 0.3s ease,
+            transform 0.3s ease;
+    }
+
+
+    /* =====================================
+       MOBILE UNDERLINE
+       ENDS WITH THE WORD
+===================================== */
+
+    .nav-links li:not(.mobile-button-item) a::after {
+
+        content: "";
+
+        position: absolute;
+
+        left: 5px;
+
+        bottom: 6px;
+
+        width: 0;
+
+        height: 2px;
+
+        background: linear-gradient(
+            90deg,
+            #0B5D3B,
+            #2E9E5B
+        );
+
+        border-radius: 10px;
+
+        transition: width 0.3s ease;
+    }
+
+
+    /* =====================================
+       MOBILE LINK HOVER
+===================================== */
+
+    .nav-links li:not(.mobile-button-item) a:hover {
+
+        color: #0B5D3B;
+
+        transform: translateX(5px);
+    }
+
+
+    /* =====================================
+       MOBILE UNDERLINE HOVER
+===================================== */
+
+    .nav-links li:not(.mobile-button-item) a:hover::after {
+
+        width: 100%;
+    }
+
+
+    /* =====================================
+       START DETECTION BUTTON
+===================================== */
+
+    .mobile-button-item {
+
+        display: block;
+
+        margin-top: 10px;
+    }
+
+
+    .mobile-button-item .nav-button {
+
+        display: block;
+
+        width: 100%;
+
+        padding: 13px 20px;
+
+        text-align: center;
+
+        background: linear-gradient(
+            135deg,
+            #0B5D3B,
+            #087F5B
+        );
+
+        color: #FFFFFF !important;
+
+        border-radius: 9px;
+
+        font-size: 15px;
+
+        font-weight: 700;
+
+        box-shadow:
+            0 6px 15px rgba(11, 93, 59, 0.22);
+    }
+
+
+    /* Mobile button hover */
+
+    .mobile-button-item .nav-button:hover {
+
+        background: linear-gradient(
+            135deg,
+            #087F5B,
+            #2E9E5B
+        );
+
+        color: #FFFFFF !important;
+
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 9px 20px rgba(11, 93, 59, 0.28);
+    }
+}
+
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 400px) {
+
+    .navbar {
+
+        width: 94%;
+
+        padding: 0 15px;
+    }
+
+
+    /* Logo */
+
+    .nav-logo {
+
+        font-size: 17px;
+    }
+
+
+    .nav-logo i {
+
+        font-size: 21px;
+    }
+
+
+    /* Hamburger */
+
+    .menu-toggle {
+
+        font-size: 22px;
+    }
+
+
+    /* Smaller drawer */
+
+    .nav-links {
+
+        width: 250px;
+    }
+}
+
+
+
+
+
+
+/* =========================================
+   NEXT PART 
+========================================= */
+
+
+
+
+
+
+
+
+/* =========================================================
+   HERO SECTION
+   ========================================================= */
+
+.hero {
+    width: 100%;
+    min-height: 620px;
+
+    padding: 70px 7% 80px;
+
+    display: flex;
+    align-items: center;
+
+    background: #F7FAF7;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   HERO CONTENT
+   ========================================================= */
+
+.hero-content {
+    width: 100%;
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 80px;
+}
+
+
+/* =========================================================
+   HERO TEXT
+   ========================================================= */
+
+.hero-text {
+    flex: 1;
+    max-width: 650px;
+}
+
+
+/* =========================================================
+   SMALL HERO TAG
+   ========================================================= */
+
+.hero-tag {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 8px 15px;
+
+    margin-bottom: 22px;
+
+    background: #E8F5ED;
+
+    color: #0B5D3B;
+
+    border: 1px solid #D1EBDD;
+
+    border-radius: 30px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+.hero-tag i {
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   HERO HEADING
+   ========================================================= */
+
+.hero-text h1 {
+    margin: 0;
+
+    font-size: 58px;
+
+    line-height: 1.08;
+
+    font-weight: 800;
+
+    color: #17221B;
+
+    letter-spacing: -1.5px;
+}
+
+
+/* =========================================================
+   TOMATO PLANTS RED
+   ========================================================= */
+
+.hero-text h1 span {
+    display: block;
+
+    color: #D9362B;
+
+    background: none;
+
+    -webkit-text-fill-color: #D9362B;
+}
+
+
+/* =========================================================
+   HERO DESCRIPTION
+   ========================================================= */
+
+.hero-text p {
+    max-width: 600px;
+
+    margin-top: 24px;
+
+    margin-bottom: 32px;
+
+    font-size: 17px;
+
+    line-height: 1.7;
+
+    color: #587067;
+}
+
+
+/* =========================================================
+   HERO BUTTONS
+   ========================================================= */
+
+.hero-buttons {
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+}
+
+
+/* =========================================================
+   PRIMARY BUTTON
+   ========================================================= */
+
+.hero-primary-btn {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    padding: 14px 24px;
+
+    background: linear-gradient(
+        135deg,
+        #0B5D3B,
+        #087F5B
+    );
+
+    color: #FFFFFF;
+
+    border-radius: 12px;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    box-shadow:
+        0 10px 24px rgba(11, 93, 59, 0.18);
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
+        background 0.3s ease;
+}
+
+
+.hero-primary-btn:hover {
+    transform: translateY(-3px);
+
+    background: linear-gradient(
+        135deg,
+        #087F5B,
+        #2E9E5B
+    );
+
+    box-shadow:
+        0 14px 28px rgba(11, 93, 59, 0.24);
+}
+
+
+/* =========================================================
+   SECONDARY BUTTON
+   ========================================================= */
+
+.hero-secondary-btn {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 9px;
+
+    padding: 14px 22px;
+
+    background: #FFFFFF;
+
+    color: #0B5D3B;
+
+    border: 1px solid #BFDCC9;
+
+    border-radius: 12px;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        background 0.3s ease,
+        border-color 0.3s ease,
+        transform 0.3s ease;
+}
+
+
+.hero-secondary-btn:hover {
+    background: #EFF9F2;
+
+    border-color: #8FC7A5;
+
+    transform: translateY(-3px);
+}
+
+
+.hero-secondary-btn i {
+    transition: transform 0.3s ease;
+}
+
+
+.hero-secondary-btn:hover i {
+    transform: translateX(4px);
+}
+
+
+/* =========================================================
+   HERO VISUAL
+   ========================================================= */
+
+.hero-visual {
+    flex: 1;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 400px;
+}
+
+
+/* =========================================================
+   HEALTHY PLANTS CARD
+   ========================================================= */
+
+.hero-image-card {
+    width: 360px;
+
+    min-height: 370px;
+
+    padding: 40px 30px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    position: relative;
+
+    background: #FFFFFF;
+
+    border: 1px solid #DDEBE2;
+
+    border-radius: 30px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 20px 50px rgba(11, 93, 59, 0.10);
+
+    transition:
+        transform 0.4s ease,
+        box-shadow 0.4s ease;
+}
+
+
+.hero-image-card:hover {
+    transform: translateY(-7px);
+
+    box-shadow:
+        0 28px 55px rgba(11, 93, 59, 0.15);
+}
+
+
+/* =========================================================
+   NO RED CIRCLE
+   ========================================================= */
+
+.hero-image-card::before {
+    display: none;
+}
+
+
+/* =========================================================
+   GREEN PLANT CIRCLE
+   ========================================================= */
+
+.hero-icon {
+    width: 110px;
+
+    height: 110px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    position: relative;
+
+    z-index: 1;
+
+    margin: 0;
+
+    flex-shrink: 0;
+
+    background: linear-gradient(
+        135deg,
+        #0B5D3B,
+        #2E9E5B
+    );
+
+    border-radius: 50%;
+
+    box-shadow:
+        0 10px 22px rgba(11, 93, 59, 0.15);
+}
+
+
+/* =========================================================
+   PLANT LOGO - EXACT CENTER
+   ========================================================= */
+
+.hero-icon i {
+    display: block;
+
+    position: absolute;
+
+    top: 50%;
+
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    margin: 0;
+
+    padding: 0;
+
+    font-size: 50px;
+
+    line-height: 1;
+
+    color: red;
+}
+
+
+/* =========================================================
+   HEALTHY PLANTS TITLE
+   ========================================================= */
+
+.hero-image-card h3 {
+    position: relative;
+
+    z-index: 1;
+
+    margin-top: 30px;
+
+    margin-bottom: 10px;
+
+    padding: 0;
+
+    font-size: 24px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+
+    color: #17221B;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   HEALTHY PLANTS DESCRIPTION
+   ========================================================= */
+
+.hero-image-card p {
+    position: relative;
+
+    z-index: 1;
+
+    max-width: 280px;
+
+    margin: 0 auto;
+
+    padding: 0;
+
+    font-size: 15px;
+
+    line-height: 1.6;
+
+    color: #60756B;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .hero {
+        padding: 65px 5%;
+    }
+
+
+    .hero-content {
+        gap: 45px;
+    }
+
+
+    .hero-text h1 {
+        font-size: 48px;
+    }
+
+
+    .hero-image-card {
+        width: 320px;
+
+        min-height: 350px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .hero {
+        min-height: auto;
+
+        padding: 55px 6% 70px;
+    }
+
+
+    .hero-content {
+        flex-direction: column;
+
+        gap: 50px;
+
+        text-align: center;
+    }
+
+
+    .hero-text {
+        max-width: 100%;
+    }
+
+
+    .hero-tag {
+        margin-bottom: 20px;
+    }
+
+
+    .hero-text h1 {
+        font-size: 40px;
+
+        line-height: 1.12;
+
+        letter-spacing: -1px;
+    }
+
+
+    .hero-text p {
+        margin-left: auto;
+
+        margin-right: auto;
+
+        font-size: 16px;
+
+        line-height: 1.65;
+    }
+
+
+    .hero-buttons {
+        justify-content: center;
+
+        flex-wrap: wrap;
+    }
+
+
+    .hero-visual {
+        width: 100%;
+
+        min-height: auto;
+    }
+
+
+    .hero-image-card {
+        width: 100%;
+
+        max-width: 350px;
+
+        min-height: 340px;
+
+        padding: 35px 25px;
+    }
+
+
+    .hero-icon {
+        width: 100px;
+
+        height: 100px;
+    }
+
+
+    .hero-icon i {
+        font-size: 46px;
+    }
+
+
+    .hero-image-card h3 {
+        margin-top: 30px;
+
+        font-size: 23px;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 430px) {
+
+    .hero {
+        padding-left: 5%;
+
+        padding-right: 5%;
+    }
+
+
+    .hero-text h1 {
+        font-size: 35px;
+    }
+
+
+    .hero-text p {
+        font-size: 15px;
+    }
+
+
+    .hero-buttons {
+        flex-direction: column;
+
+        width: 100%;
+    }
+
+
+    .hero-primary-btn,
+    .hero-secondary-btn {
+        width: 100%;
+    }
+
+
+    .hero-image-card {
+        min-height: 320px;
+    }
+
+
+    .hero-icon {
+        width: 95px;
+
+        height: 95px;
+    }
+
+
+    .hero-icon i {
+        font-size: 43px;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   DISEASE DETECTION SECTION
+   ========================================================= */
+
+.detection-section {
+    width: 100%;
+
+    padding: 90px 7% 100px;
+
+    background: #FFFFFF;
+}
+
+
+/* =========================================================
+   DETECTION CONTAINER
+   ========================================================= */
+
+.detection-container {
+    width: 100%;
+
+    max-width: 1200px;
+
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   SECTION HEADING
+   ========================================================= */
+
+.detection-heading {
+    text-align: center;
+
+    max-width: 750px;
+
+    margin: 0 auto 55px;
+}
+
+
+/* =========================================================
+   SECTION TAG
+   ========================================================= */
+
+.section-tag {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 8px 15px;
+
+    margin-bottom: 20px;
+
+    background: #E8F5ED;
+
+    color: #0B5D3B;
+
+    border: 1px solid #D1EBDD;
+
+    border-radius: 30px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+.section-tag i {
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   DETECTION HEADING
+   ========================================================= */
+
+.detection-heading h2 {
+    margin: 0;
+
+    font-size: 46px;
+
+    line-height: 1.15;
+
+    font-weight: 800;
+
+    letter-spacing: -1px;
+
+    color: #17221B;
+}
+
+
+/* RED HIGHLIGHT */
+.detection-heading h2 span {
+    display: block;
+
+    color: #D9362B;
+}
+
+
+/* =========================================================
+   DETECTION DESCRIPTION
+   ========================================================= */
+
+.detection-heading > p {
+    max-width: 650px;
+
+    margin: 20px auto 0;
+
+    font-size: 17px;
+
+    line-height: 1.7;
+
+    color: #60756B;
+}
+
+
+/* =========================================================
+   MAIN DETECTION CARD
+   ========================================================= */
+
+.detection-card {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    background: #F7FAF7;
+
+    border: 1px solid #DDEBE2;
+
+    border-radius: 28px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 20px 50px rgba(11, 93, 59, 0.08);
+}
+
+
+/* =========================================================
+   UPLOAD AREA
+   ========================================================= */
+
+.upload-area {
+    min-height: 500px;
+
+    padding: 55px 45px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    background: #FFFFFF;
+
+    border-right: 1px solid #DDEBE2;
+}
+
+
+/* =========================================================
+   UPLOAD ICON
+   ========================================================= */
+
+.upload-icon {
+    width: 100px;
+
+    height: 100px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin-bottom: 25px;
+
+    background: linear-gradient(
+        135deg,
+        #E8F5ED,
+        #DDF2E5
+    );
+
+    border: 1px solid #CBE5D4;
+
+    border-radius: 50%;
+
+    color: #0B5D3B;
+
+    font-size: 40px;
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+.upload-icon:hover {
+    transform: translateY(-5px);
+
+    box-shadow:
+        0 12px 25px rgba(11, 93, 59, 0.12);
+}
+
+
+/* =========================================================
+   UPLOAD TITLE
+   ========================================================= */
+
+.upload-area h3 {
+    margin: 0 0 12px;
+
+    font-size: 25px;
+
+    font-weight: 700;
+
+    color: #17221B;
+}
+
+
+/* =========================================================
+   UPLOAD DESCRIPTION
+   ========================================================= */
+
+.upload-area > p {
+    max-width: 390px;
+
+    margin: 0 auto 25px;
+
+    font-size: 15px;
+
+    line-height: 1.65;
+
+    color: #60756B;
+}
+
+
+/* =========================================================
+   CHOOSE IMAGE BUTTON
+   ========================================================= */
+
+.upload-button {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    padding: 14px 25px;
+
+    background: linear-gradient(
+        135deg,
+        #0B5D3B,
+        #087F5B
+    );
+
+    color: #FFFFFF;
+
+    border-radius: 12px;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 10px 22px rgba(11, 93, 59, 0.18);
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
+        background 0.3s ease;
+}
+
+
+.upload-button:hover {
+    transform: translateY(-3px);
+
+    background: linear-gradient(
+        135deg,
+        #087F5B,
+        #2E9E5B
+    );
+
+    box-shadow:
+        0 14px 28px rgba(11, 93, 59, 0.23);
+}
+
+
+.upload-button i {
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   FILE FORMAT TEXT
+   ========================================================= */
+
+.upload-area small {
+    margin-top: 15px;
+
+    font-size: 12px;
+
+    color: #84958D;
+}
+
+
+/* =========================================================
+   DETECTION INFO
+   ========================================================= */
+
+.detection-info {
+    min-height: 500px;
+
+    padding: 55px 45px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    background: #F7FAF7;
+}
+
+
+/* =========================================================
+   INFO ICON
+   ========================================================= */
+
+.info-icon {
+    width: 58px;
+
+    height: 58px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin-bottom: 20px;
+
+    background: #E8F5ED;
+
+    color: #0B5D3B;
+
+    border: 1px solid #D1EBDD;
+
+    border-radius: 15px;
+
+    font-size: 24px;
+}
+
+
+/* =========================================================
+   INFO TITLE
+   ========================================================= */
+
+.detection-info > h3 {
+    margin: 0 0 12px;
+
+    font-size: 26px;
+
+    font-weight: 700;
+
+    color: #17221B;
+}
+
+
+/* =========================================================
+   INFO DESCRIPTION
+   ========================================================= */
+
+.detection-info > p {
+    max-width: 480px;
+
+    margin: 0 0 30px;
+
+    font-size: 15px;
+
+    line-height: 1.7;
+
+    color: #60756B;
+}
+
+
+/* =========================================================
+   DETECTION STEPS
+   ========================================================= */
+
+.detection-steps {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 17px;
+}
+
+
+/* =========================================================
+   STEP
+   ========================================================= */
+
+.step {
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 12px 0;
+}
+
+
+/* =========================================================
+   STEP NUMBER
+   ========================================================= */
+
+.step > span {
+    width: 43px;
+
+    height: 43px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #FFFFFF;
+
+    color: #0B5D3B;
+
+    border: 1px solid #CBE5D4;
+
+    border-radius: 12px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   STEP TEXT
+   ========================================================= */
+
+.step h4 {
+    margin: 0 0 3px;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    color: #17221B;
+}
+
+
+.step p {
+    margin: 0;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+    color: #71847B;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .detection-section {
+        padding: 75px 5% 85px;
+    }
+
+    .detection-heading h2 {
+        font-size: 40px;
+    }
+
+    .detection-card {
+        grid-template-columns: 1fr;
+    }
+
+    .upload-area {
+        min-height: 430px;
+
+        border-right: none;
+
+        border-bottom: 1px solid #DDEBE2;
+    }
+
+    .detection-info {
+        min-height: auto;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .detection-section {
+        padding: 65px 6% 75px;
+    }
+
+    .detection-heading {
+        margin-bottom: 40px;
+    }
+
+    .detection-heading h2 {
+        font-size: 35px;
+
+        line-height: 1.18;
+    }
+
+    .detection-heading > p {
+        font-size: 16px;
+
+        line-height: 1.65;
+    }
+
+    .detection-card {
+        border-radius: 22px;
+    }
+
+    .upload-area {
+        min-height: 400px;
+
+        padding: 45px 25px;
+    }
+
+    .upload-icon {
+        width: 85px;
+
+        height: 85px;
+
+        font-size: 34px;
+    }
+
+    .upload-area h3 {
+        font-size: 23px;
+    }
+
+    .detection-info {
+        padding: 45px 25px;
+    }
+
+    .detection-info > h3 {
+        font-size: 23px;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 430px) {
+
+    .detection-section {
+        padding-left: 5%;
+
+        padding-right: 5%;
+    }
+
+    .detection-heading h2 {
+        font-size: 31px;
+    }
+
+    .detection-heading > p {
+        font-size: 15px;
+    }
+
+    .upload-area {
+        padding: 40px 20px;
+    }
+
+    .upload-area h3 {
+        font-size: 21px;
+    }
+
+    .upload-area > p {
+        font-size: 14px;
+    }
+
+    .upload-button {
+        width: 100%;
+
+        max-width: 240px;
+    }
+
+    .detection-info {
+        padding: 40px 20px;
+    }
+
+    .detection-info > h3 {
+        font-size: 21px;
+    }
+
+    .step {
+        align-items: flex-start;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   UPLOAD OPTIONS
+   ========================================================= */
+
+.upload-options {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    margin-top: 5px;
+}
+
+
+/* =========================================================
+   CHOOSE IMAGE BUTTON
+   ========================================================= */
+
+.choose-button {
+    background: #FFFFFF;
+
+    color: #0B5D3B;
+
+    border: 1px solid #BFDCC9;
+
+    box-shadow: none;
+}
+
+
+.choose-button:hover {
+    background: #EFF9F2;
+
+    color: #0B5D3B;
+
+    border-color: #8FC7A5;
+
+    box-shadow:
+        0 10px 22px rgba(11, 93, 59, 0.10);
+}
+
+
+/* =========================================================
+   CAMERA BUTTON
+   ========================================================= */
+
+.camera-button {
+    background: linear-gradient(
+        135deg,
+        #0B5D3B,
+        #087F5B
+    );
+
+    color: #FFFFFF;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 430px) {
+
+    .upload-options {
+        flex-direction: column;
+
+        width: 100%;
+
+        gap: 10px;
+    }
+
+    .upload-options .upload-button {
+        width: 100%;
+
+        max-width: 240px;
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   ABOUT SECTION
+   ========================================================= */
+
+.about-section {
+    width: 100%;
+
+    padding: 90px 7% 100px;
+
+    background: #F7FAF7;
+}
+
+
+/* =========================================================
+   ABOUT CONTAINER
+   ========================================================= */
+
+.about-container {
+    width: 100%;
+
+    max-width: 1200px;
+
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   ABOUT HEADING
+   ========================================================= */
+
+.about-heading {
+    max-width: 750px;
+
+    margin: 0 auto 60px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   ABOUT HEADING TITLE
+   ========================================================= */
+
+.about-heading h2 {
+    margin: 0;
+
+    font-size: 46px;
+
+    line-height: 1.15;
+
+    font-weight: 800;
+
+    letter-spacing: -1px;
+
+    color: #17221B;
+}
+
+
+/* RED HIGHLIGHT */
+
+.about-heading h2 span {
+    display: block;
+
+    color: #D9362B;
+}
+
+
+/* =========================================================
+   ABOUT HEADING DESCRIPTION
+   ========================================================= */
+
+.about-heading > p {
+    max-width: 650px;
+
+    margin: 20px auto 0;
+
+    font-size: 17px;
+
+    line-height: 1.7;
+
+    color: #60756B;
+}
+
+
+/* =========================================================
+   ABOUT CONTENT
+   ========================================================= */
+
+.about-content {
+    display: grid;
+
+    grid-template-columns: 1.1fr 0.9fr;
+
+    align-items: center;
+
+    gap: 75px;
+}
+
+
+/* =========================================================
+   ABOUT TEXT
+   ========================================================= */
+
+.about-text {
+    max-width: 620px;
+}
+
+
+.about-text > h3 {
+    margin: 0 0 18px;
+
+    font-size: 30px;
+
+    line-height: 1.25;
+
+    font-weight: 750;
+
+    color: #17221B;
+}
+
+
+.about-text > p {
+    margin: 0 0 17px;
+
+    font-size: 15px;
+
+    line-height: 1.75;
+
+    color: #60756B;
+}
+
+
+/* =========================================================
+   ABOUT FEATURES
+   ========================================================= */
+
+.about-features {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 18px;
+
+    margin-top: 32px;
+}
+
+
+/* =========================================================
+   ABOUT FEATURE
+   ========================================================= */
+
+.about-feature {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 13px;
+
+    padding: 17px;
+
+    background: #FFFFFF;
+
+    border: 1px solid #DDEBE2;
+
+    border-radius: 15px;
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
+        border-color 0.3s ease;
+}
+
+
+.about-feature:hover {
+    transform: translateY(-4px);
+
+    border-color: #BFDCC9;
+
+    box-shadow:
+        0 12px 28px rgba(11, 93, 59, 0.08);
+}
+
+
+/* =========================================================
+   FEATURE ICON
+   ========================================================= */
+
+.feature-icon {
+    width: 42px;
+
+    height: 42px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #E8F5ED;
+
+    color: #0B5D3B;
+
+    border: 1px solid #D1EBDD;
+
+    border-radius: 11px;
+
+    font-size: 17px;
+}
+
+
+/* =========================================================
+   FEATURE TEXT
+   ========================================================= */
+
+.about-feature h4 {
+    margin: 1px 0 5px;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    color: #17221B;
+}
+
+
+.about-feature p {
+    margin: 0;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+
+    color: #71847B;
+}
+
+
+/* =========================================================
+   ABOUT VISUAL
+   ========================================================= */
+
+.about-visual {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+/* =========================================================
+   ABOUT CARD
+   ========================================================= */
+
+.about-card {
+    width: 100%;
+
+    max-width: 410px;
+
+    padding: 45px 38px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    background: #FFFFFF;
+
+    border: 1px solid #DDEBE2;
+
+    border-radius: 28px;
+
+    box-shadow:
+        0 20px 50px rgba(11, 93, 59, 0.10);
+
+    transition:
+        transform 0.4s ease,
+        box-shadow 0.4s ease;
+}
+
+
+.about-card:hover {
+    transform: translateY(-7px);
+
+    box-shadow:
+        0 28px 55px rgba(11, 93, 59, 0.15);
+}
+
+
+/* =========================================================
+   DECORATIVE TOP
+   ========================================================= */
+
+.about-card::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+
+    left: 0;
+
+    width: 100%;
+
+    height: 5px;
+
+    background: linear-gradient(
+        90deg,
+        #0B5D3B,
+        #2E9E5B
+    );
+}
+
+
+/* =========================================================
+   ABOUT CARD ICON
+   ========================================================= */
+
+.about-card-icon {
+    width: 75px;
+
+    height: 75px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin-bottom: 22px;
+
+    background: linear-gradient(
+        135deg,
+        #0B5D3B,
+        #2E9E5B
+    );
+
+    color: #FFFFFF;
+
+    border-radius: 20px;
+
+    font-size: 32px;
+
+    box-shadow:
+        0 12px 25px rgba(11, 93, 59, 0.16);
+}
+
+
+/* =========================================================
+   CARD LABEL
+   ========================================================= */
+
+.about-card-label {
+    display: inline-block;
+
+    margin-bottom: 12px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.5px;
+
+    text-transform: uppercase;
+
+    color: #0B5D3B;
+}
+
+
+/* =========================================================
+   CARD TITLE
+   ========================================================= */
+
+.about-card h3 {
+    margin: 0 0 15px;
+
+    font-size: 28px;
+
+    line-height: 1.25;
+
+    font-weight: 800;
+
+    color: #17221B;
+}
+
+
+/* RED PART */
+
+.about-card h3 span {
+    display: block;
+
+    color: #D9362B;
+}
+
+
+/* =========================================================
+   CARD DESCRIPTION
+   ========================================================= */
+
+.about-card > p {
+    margin: 0;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+
+    color: #60756B;
+}
+
+
+/* =========================================================
+   ABOUT STAT
+   ========================================================= */
+
+.about-stat {
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    margin-top: 28px;
+
+    padding: 15px;
+
+    background: #F7FAF7;
+
+    border: 1px solid #DDEBE2;
+
+    border-radius: 14px;
+}
+
+
+/* =========================================================
+   STAT ICON
+   ========================================================= */
+
+.stat-icon {
+    width: 43px;
+
+    height: 43px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #E8F5ED;
+
+    color: #0B5D3B;
+
+    border-radius: 11px;
+
+    font-size: 17px;
+}
+
+
+/* =========================================================
+   STAT TEXT
+   ========================================================= */
+
+.about-stat strong {
+    display: block;
+
+    margin-bottom: 3px;
+
+    font-size: 14px;
+
+    color: #17221B;
+}
+
+
+.about-stat small {
+    display: block;
+
+    font-size: 11px;
+
+    color: #71847B;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .about-section {
+        padding: 75px 5% 85px;
+    }
+
+    .about-content {
+        grid-template-columns: 1fr;
+
+        gap: 50px;
+    }
+
+    .about-text {
+        max-width: 100%;
+    }
+
+    .about-visual {
+        width: 100%;
+    }
+
+    .about-card {
+        max-width: 500px;
+    }
+
+    .about-heading h2 {
+        font-size: 40px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .about-section {
+        padding: 65px 6% 75px;
+    }
+
+    .about-heading {
+        margin-bottom: 45px;
+    }
+
+    .about-heading h2 {
+        font-size: 35px;
+
+        line-height: 1.18;
+    }
+
+    .about-heading > p {
+        font-size: 16px;
+
+        line-height: 1.65;
+    }
+
+    .about-text > h3 {
+        font-size: 25px;
+    }
+
+    .about-text > p {
+        font-size: 15px;
+    }
+
+    .about-features {
+        grid-template-columns: 1fr;
+
+        gap: 13px;
+    }
+
+    .about-card {
+        padding: 38px 28px;
+
+        border-radius: 23px;
+    }
+
+    .about-card h3 {
+        font-size: 25px;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 430px) {
+
+    .about-section {
+        padding-left: 5%;
+
+        padding-right: 5%;
+    }
+
+    .about-heading h2 {
+        font-size: 31px;
+    }
+
+    .about-heading > p {
+        font-size: 15px;
+    }
+
+    .about-text > h3 {
+        font-size: 23px;
+    }
+
+    .about-text > p {
+        font-size: 14px;
+    }
+
+    .about-card {
+        padding: 35px 22px;
+    }
+
+    .about-card-icon {
+        width: 68px;
+
+        height: 68px;
+
+        font-size: 29px;
+    }
+
+    .about-card h3 {
+        font-size: 23px;
+    }
+}
+
+
+
+
+
+
+/* =========================================================
+   HOW IT WORKS SECTION
+   ========================================================= */
+
+.how-section {
+    width: 100%;
+
+    padding: 90px 7% 100px;
+
+    background: #FFFFFF;
+}
+
+
+/* =========================================================
+   HOW CONTAINER
+   ========================================================= */
+
+.how-container {
+    width: 100%;
+
+    max-width: 1200px;
+
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   SECTION HEADING
+   ========================================================= */
+
+.how-heading {
+    max-width: 750px;
+
+    margin: 0 auto 60px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   HEADING
+   ========================================================= */
+
+.how-heading h2 {
+    margin: 0;
+
+    font-size: 46px;
+
+    line-height: 1.15;
+
+    font-weight: 800;
+
+    letter-spacing: -1px;
+
+    color: #17221B;
+}
+
+
+/* RED HIGHLIGHT */
+
+.how-heading h2 span {
+    display: block;
+
+    color: #D9362B;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+   ========================================================= */
+
+.how-heading > p {
+    max-width: 650px;
+
+    margin: 20px auto 0;
+
+    font-size: 17px;
+
+    line-height: 1.7;
+
+    color: #60756B;
+}
+
+
+/* =========================================================
+   STEPS CONTAINER
+   ========================================================= */
+
+.how-steps {
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 25px;
+}
+
+
+/* =========================================================
+   INDIVIDUAL STEP
+   ========================================================= */
+
+.how-step {
+    flex: 1;
+
+    max-width: 320px;
+
+    min-height: 320px;
+
+    padding: 30px 25px;
+
+    position: relative;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    text-align: center;
+
+    background: #FFFFFF;
+    background-size: cover;
+
+    border: 1px solid #DDEBE2;
+
+    border-radius: 22px;
+
+    transition:
+        transform 0.35s ease,
+        box-shadow 0.35s ease,
+        border-color 0.35s ease;
+}
+
+
+.how-step:hover {
+    transform: translateY(-7px);
+
+    border-color: #BFDCC9;
+
+    box-shadow:
+        0 18px 38px rgba(11, 93, 59, 0.10);
+}
+
+
+/* =========================================================
+   STEP NUMBER
+   ========================================================= */
+
+.how-step-number {
+    position: absolute;
+
+    top: 18px;
+
+    right: 20px;
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    color: #A7B9AF;
+
+    letter-spacing: 1px;
+}
+
+
+/* =========================================================
+   STEP ICON
+   ========================================================= */
+
+.how-step-icon {
+    width: 82px;
+
+    height: 82px;
+
+    margin: 25px 0 22px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: linear-gradient(
+        135deg,
+        #0B5D3B,
+        #2E9E5B
+    );
+
+    color: #FFFFFF;
+
+    border-radius: 22px;
+
+    font-size: 30px;
+
+    box-shadow:
+        0 12px 25px rgba(11, 93, 59, 0.15);
+
+    transition:
+        transform 0.35s ease;
+}
+
+
+.how-step:hover .how-step-icon {
+    transform: scale(1.06) rotate(-3deg);
+}
+
+
+/* =========================================================
+   STEP TITLE
+   ========================================================= */
+
+.how-step h3 {
+    margin: 0 0 10px;
+
+    font-size: 21px;
+
+    font-weight: 700;
+
+    color: #17221B;
+}
+
+
+/* =========================================================
+   STEP DESCRIPTION
+   ========================================================= */
+
+.how-step p {
+    max-width: 250px;
+
+    margin: 0;
+
+    font-size: 14px;
+
+    line-height: 1.65;
+
+    color: #60756B;
+}
+
+
+/* =========================================================
+   CONNECTOR
+   ========================================================= */
+
+.how-connector {
+    width: 45px;
+
+    height: 45px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #0B5D3B;
+
+    background: #E8F5ED;
+
+    border: 1px solid #D1EBDD;
+
+    border-radius: 50%;
+
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .how-section {
+        padding: 75px 5% 85px;
+    }
+
+    .how-heading h2 {
+        font-size: 40px;
+    }
+
+    .how-steps {
+        gap: 15px;
+    }
+
+    .how-step {
+        min-height: 330px;
+
+        padding: 28px 18px;
+    }
+
+    .how-connector {
+        width: 38px;
+
+        height: 38px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .how-section {
+        padding: 65px 6% 75px;
+    }
+
+    .how-heading {
+        margin-bottom: 45px;
+    }
+
+    .how-heading h2 {
+        font-size: 35px;
+
+        line-height: 1.18;
+    }
+
+    .how-heading > p {
+        font-size: 16px;
+
+        line-height: 1.65;
+    }
+
+    .how-steps {
+        flex-direction: column;
+
+        gap: 18px;
+    }
+
+    .how-step {
+        width: 100%;
+
+        max-width: 450px;
+
+        min-height: auto;
+
+        padding: 30px 25px;
+    }
+
+    .how-connector {
+        transform: rotate(90deg);
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 430px) {
+
+    .how-section {
+        padding-left: 5%;
+
+        padding-right: 5%;
+    }
+
+    .how-heading h2 {
+        font-size: 31px;
+    }
+
+    .how-heading > p {
+        font-size: 15px;
+    }
+
+    .how-step {
+        padding: 28px 20px;
+    }
+
+    .how-step-icon {
+        width: 75px;
+
+        height: 75px;
+
+        font-size: 27px;
+    }
+
+    .how-step h3 {
+        font-size: 20px;
+    }
+
+    .how-step p {
+        font-size: 13px;
+    }
+}
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   DISEASE INFORMATION SECTION
+   ========================================================= */
+
+.disease-section {
+    width: 100%;
+    padding: 90px 7% 100px;
+    background: #F7FAF7;
+}
+
+
+/* =========================================================
+   DISEASE CONTAINER
+   ========================================================= */
+
+.disease-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   SECTION HEADING
+   ========================================================= */
+
+.disease-heading {
+    max-width: 750px;
+    margin: 0 auto 55px;
+    text-align: center;
+}
+
+
+.disease-heading h2 {
+    margin: 0;
+
+    font-size: 46px;
+    line-height: 1.15;
+    font-weight: 800;
+
+    letter-spacing: -1px;
+
+    color: #17221B;
+}
+
+
+.disease-heading h2 span {
+    display: block;
+    color: #D9362B;
+}
+
+
+.disease-heading > p {
+    max-width: 650px;
+
+    margin: 20px auto 0;
+
+    font-size: 17px;
+    line-height: 1.7;
+
+    color: #60756B;
+}
+
+
+/* =========================================================
+   DISEASE GRID
+   ========================================================= */
+
+.disease-grid {
+    display: grid;
+
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 20px;
+}
+
+
+/* =========================================================
+   DISEASE CARD
+   ========================================================= */
+
+.disease-card {
+    padding: 30px 25px;
+
+    background:url("/static/log2.jpg") no-repeat center center;
+    background-size: cover;
+
+    border: 1px solid #DDEBE2;
+
+    border-radius: 22px;
+
+    transition:
+        transform 0.35s ease,
+        box-shadow 0.35s ease,
+        border-color 0.35s ease;
+}
+
+
+.disease-card:hover {
+    transform: translateY(-7px);
+
+    border-color: #BFDCC9;
+
+    box-shadow:
+        0 18px 38px rgba(11, 93, 59, 0.10);
+}
+
+
+/* =========================================================
+   DISEASE ICON
+   ========================================================= */
+
+.disease-card-icon {
+    width: 58px;
+    height: 58px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 20px;
+
+    background: #E8F5ED;
+    
+
+    color: #0B5D3B;
+
+    border: 1px solid #D1EBDD;
+
+    border-radius: 15px;
+
+    font-size: 23px;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.disease-status {
+    display: inline-block;
+
+    margin-bottom: 10px;
+
+    padding: 5px 10px;
+
+    background: #EFF9F2;
+
+    color: #0B5D3B;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   DISEASE TITLE
+   ========================================================= */
+
+.disease-card h3 {
+    margin: 0 0 12px;
+
+    font-size: 21px;
+
+    font-weight: 700;
+
+    color: #17221B;
+}
+
+
+/* =========================================================
+   DISEASE DESCRIPTION
+   ========================================================= */
+
+.disease-card p {
+    min-height: 95px;
+
+    margin: 0;
+
+
+    font-size: 13px;
+
+    line-height: 1.65;
+
+    color: black;
+
+}
+/* =========================================================
+   LEARN MORE
+   ========================================================= */
+
+.disease-link {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin-top: 20px;
+
+    color:brown;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        color 0.3s ease,
+        gap 0.3s ease;
+}
+
+
+.disease-link:hover {
+    color: #087F5B;
+
+    gap: 11px;
+}
+
+
+.disease-link i {
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+    .disease-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .disease-section {
+        padding: 65px 6% 75px;
+    }
+
+    .disease-heading {
+        margin-bottom: 40px;
+    }
+
+    .disease-heading h2 {
+        font-size: 35px;
+        line-height: 1.18;
+    }
+
+    .disease-heading > p {
+        font-size: 16px;
+    }
+
+    .disease-grid {
+        grid-template-columns: 1fr;
+
+        gap: 16px;
+    }
+
+    .disease-card {
+        padding: 28px 23px;
+    }
+
+    .disease-card p {
+        min-height: auto;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 430px) {
+
+    .disease-section {
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+
+    .disease-heading h2 {
+        font-size: 31px;
+    }
+
+    .disease-heading > p {
+        font-size: 15px;
+    }
+
+    .disease-card h3 {
+        font-size: 20px;
+    }
+
+    .disease-card p {
+        font-size: 13px;
+    }
+
+}
+
+
+
+
+/* =========================================================
+   FOOTER SECTION
+   ========================================================= */
+
+.footer {
+    width: 100%;
+    background: #17221B;
+    color: #FFFFFF;
+    margin-top: 0;
+}
+
+.footer-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 70px 7% 55px;
+
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+    gap: 55px;
+}
+
+
+/* =========================================================
+   FOOTER BRAND
+   ========================================================= */
+
+.footer-brand {
+    max-width: 360px;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-bottom: 20px;
+
+    color: #FFFFFF;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.footer-logo i {
+    font-size: 25px;
+    color: red;
+}
+
+.footer-brand > p {
+    margin: 0;
+
+    font-size: 14px;
+    line-height: 1.75;
+    color: #B8C8C0;
+}
+
+.footer-ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-top: 22px;
+    padding: 9px 13px;
+
+    background: rgba(46,158,91,0.12);
+    border: 1px solid rgba(46,158,91,0.28);
+    border-radius: 20px;
+
+    color: #8FD3A8;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.footer-ai-badge i {
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   FOOTER COLUMNS
+   ========================================================= */
+
+.footer-column h3 {
+    margin: 0 0 20px;
+
+    font-size: 16px;
+    font-weight: 700;
+    color: #FFFFFF;
+}
+
+.footer-column ul {
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+.footer-column ul li {
+    margin-bottom: 12px;
+}
+
+.footer-column ul li a {
+    display: inline-block;
+
+    color: #B8C8C0;
+    text-decoration: none;
+
+    font-size: 13px;
+
+    transition:
+        color .3s ease,
+        transform .3s ease;
+}
+
+.footer-column ul li a:hover {
+    color: #8FD3A8;
+    transform: translateX(4px);
+}
+
+
+/* =========================================================
+   FOOTER ACTION
+   ========================================================= */
+
+.footer-action > p {
+    margin: 0 0 20px;
+
+    font-size: 13px;
+    line-height: 1.65;
+    color: #B8C8C0;
+}
+
+.footer-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+    padding: 12px 19px;
+
+    background: linear-gradient(
+        135deg,
+        #0B5D3B,
+        #087F5B
+    );
+
+    color: #FFFFFF;
+    text-decoration: none;
+
+    border-radius: 10px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,0.18);
+
+    transition:
+        transform .3s ease,
+        box-shadow .3s ease,
+        background .3s ease;
+}
+
+.footer-button:hover {
+    transform: translateY(-3px);
+
+    background: linear-gradient(
+        135deg,
+        #087F5B,
+        #2E9E5B
+    );
+
+    box-shadow:
+        0 12px 25px rgba(0,0,0,0.24);
+}
+
+.footer-button i {
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   FOOTER BOTTOM
+   ========================================================= */
+
+.footer-bottom {
+    width: 100%;
+
+    border-top: 1px solid rgba(255,255,255,0.09);
+}
+
+.footer-bottom-content {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 7%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.footer-bottom-content p {
+    margin: 0;
+
+    font-size: 12px;
+    color: #8FA29A;
+}
+
+.footer-made {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.footer-made i {
+    color: #D9362B;
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+    .footer-container {
+        grid-template-columns: 1.4fr 1fr 1fr;
+        gap: 40px;
+    }
+
+    .footer-action {
+        grid-column: 1 / -1;
+        max-width: 400px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .footer-container {
+        grid-template-columns: 1fr;
+        gap: 35px;
+
+        padding: 60px 6% 45px;
+    }
+
+    .footer-brand {
+        max-width: 100%;
+    }
+
+    .footer-column {
+        width: 100%;
+    }
+
+    .footer-action {
+        grid-column: auto;
+        max-width: 100%;
+    }
+
+    .footer-column h3 {
+        margin-bottom: 15px;
+    }
+
+    .footer-column ul li {
+        margin-bottom: 10px;
+    }
+
+    .footer-bottom-content {
+        padding: 18px 6%;
+
+        flex-direction: column;
+        text-align: center;
+
+        gap: 8px;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 430px) {
+
+    .footer-container {
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+
+    .footer-logo {
+        font-size: 19px;
+    }
+
+    .footer-brand > p {
+        font-size: 13px;
+    }
+
+    .footer-ai-badge {
+        font-size: 10px;
+    }
+
+    .footer-bottom-content {
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+
+    .footer-bottom-content p {
+        font-size: 11px;
+    }
+}
+
+
+
+
+
+/* =========================================================
+   SELECTED IMAGE PREVIEW
+   ========================================================= */
+
+.selected-image-area {
+    display: none;
+    width: 100%;
+    margin: 25px auto 15px;
+    text-align: center;
+}
+
+.selected-image-area.active {
+    display: block;
+}
+
+#image-preview {
+    display: block;
+    width: 280px;
+    height: 220px;
+    max-width: 100%;
+    max-height: 220px;
+    margin: 0 auto;
+    object-fit: cover;
+    border-radius: 16px;
+    border: 1px solid #DDEBE2;
+    box-shadow: 0 10px 25px rgba(11, 93, 59, 0.12);
+}
+
+/* =========================================================
+   PREDICT DISEASE BUTTON
+   ========================================================= */
+
+.predict-button {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    width: 100%;
+    max-width: 280px;
+
+    margin: 20px auto 0;
+
+    padding: 14px 22px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: linear-gradient(
+        135deg,
+        #0B5D3B,
+        #087F5B
+    );
+
+    color: #FFFFFF;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: all 0.25s ease;
+}
+
+.predict-button:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 20px rgba(11, 93, 59, 0.25);
+}
+
+.predict-button:active {
+
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .image-preview {
+        width: 260px !important;
+        height: 210px !important;
+
+        max-width: 260px !important;
+        max-height: 210px !important;
+    }
+
+    .predict-button {
+        max-width: 260px;
+    }
+
+}
+
+
+@media (max-width: 430px) {
+
+    .image-preview {
+        width: 220px !important;
+        height: 180px !important;
+
+        max-width: 220px !important;
+        max-height: 180px !important;
+    }
+
+    .predict-button {
+        max-width: 220px;
+    }
+
+}
+
+
+
+
+
+
+/* =========================================================
+   CAMERA MODAL
+   ========================================================= */
+
+#camera-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.75);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+#camera-modal.active {
+    display: flex;
+}
+
+.camera-box {
+    width: 100%;
+    max-width: 600px;
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+}
+
+.camera-box h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+#camera-video {
+    width: 100%;
+    max-height: 450px;
+    object-fit: cover;
+    border-radius: 15px;
+    background: #000;
+}
+
+.camera-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.camera-control-button {
+    border: none;
+    padding: 12px 22px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.close-camera-button {
+    background: #ddd;
+}
