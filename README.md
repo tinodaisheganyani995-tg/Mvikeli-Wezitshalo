@@ -3,7 +3,7 @@ title: Mvikeli Wezitshalo
 emoji: 🐢
 colorFrom: indigo
 colorTo: green
-sdk: static
+sdk: docker
 pinned: false
 license: mit
 ---
