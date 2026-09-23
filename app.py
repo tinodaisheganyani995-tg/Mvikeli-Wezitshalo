@@ -4,8 +4,6 @@
 #
 # FULL IMPROVED APP.PY
 #
-# MEMORY-SAFE VERSION FOR RENDER / CPU DEPLOYMENT
-#
 # FEATURES
 # ---------------------------------------------------------
 # 1. Tomato / non-tomato gatekeeper
@@ -27,13 +25,6 @@
 # 14. Confusion matrix
 # 15. About page
 # 16. Health endpoint
-#
-# MEMORY / DEPLOYMENT IMPROVEMENTS
-# ---------------------------------------------------------
-# 17. Uploaded images resized before processing
-# 18. Large original images no longer used for Grad-CAM
-# 19. Torch inference_mode for normal predictions
-# 20. Better exception logging
 #
 # NOT INCLUDED YET
 # ---------------------------------------------------------
@@ -63,7 +54,6 @@ import os
 import uuid
 import cv2
 import numpy as np
-import traceback
 
 from werkzeug.utils import secure_filename
 
@@ -73,7 +63,8 @@ from reportlab.platypus import (
     Spacer,
     Image as PDFImage,
     Table,
-    TableStyle
+    TableStyle,
+    KeepTogether
 )
 
 from reportlab.lib.styles import (
@@ -96,6 +87,7 @@ from xml.sax.saxutils import escape
 
 from datetime import datetime
 
+# Evaluation
 from sklearn.metrics import (
     accuracy_score,
     precision_score,
@@ -131,20 +123,6 @@ os.makedirs(
     UPLOAD_FOLDER,
     exist_ok=True
 )
-
-
-# =========================================================
-# MEMORY-SAFETY SETTINGS
-# =========================================================
-
-# The AI model already resizes images to 224 x 224.
-# There is therefore no benefit in keeping a huge
-# 4000 x 3000 or 6000 x 4000 phone image during processing.
-
-MAX_UPLOAD_DIMENSION = 1600
-
-# JPEG quality for the normalized processing image.
-NORMALIZED_JPEG_QUALITY = 90
 
 
 # =========================================================
@@ -223,9 +201,23 @@ GATEKEEPER_PATH = (
 # 8. AI THRESHOLDS
 # =========================================================
 
+# ---------------------------------------------------------
+# Disease confidence threshold
+# ---------------------------------------------------------
+
 UNCERTAINTY_THRESHOLD = 70.0
 
+
+# ---------------------------------------------------------
+# Top-1 vs Top-2 margin threshold
+# ---------------------------------------------------------
+
 MARGIN_THRESHOLD = 10.0
+
+
+# ---------------------------------------------------------
+# Gatekeeper threshold
+# ---------------------------------------------------------
 
 GATEKEEPER_THRESHOLD = 80.0
 
@@ -413,131 +405,18 @@ latest_result = None
 
 
 # =========================================================
-# 16. NORMALIZE UPLOADED IMAGE
-#
-# IMPORTANT MEMORY FIX
-#
-# Large phone images such as:
-#
-# 4032 x 3024
-# 4608 x 3456
-# 6000 x 4000
-#
-# are reduced before OpenCV, prediction and Grad-CAM.
-# =========================================================
-
-def normalize_uploaded_image(
-    input_path,
-    output_path
-):
-
-    try:
-
-        with Image.open(
-            input_path
-        ) as image:
-
-            image = image.convert(
-                "RGB"
-            )
-
-            original_width, original_height = (
-                image.size
-            )
-
-            print("=" * 60)
-            print("IMAGE NORMALIZATION")
-            print("=" * 60)
-
-            print(
-                "Original resolution:",
-                original_width,
-                "x",
-                original_height
-            )
-
-            # -------------------------------------------------
-            # Resize only when necessary.
-            # Smaller images are NOT enlarged.
-            # -------------------------------------------------
-
-            image.thumbnail(
-
-                (
-                    MAX_UPLOAD_DIMENSION,
-                    MAX_UPLOAD_DIMENSION
-                ),
-
-                Image.Resampling.LANCZOS
-
-            )
-
-            new_width, new_height = (
-                image.size
-            )
-
-            print(
-                "Processing resolution:",
-                new_width,
-                "x",
-                new_height
-            )
-
-            image.save(
-
-                output_path,
-
-                format="JPEG",
-
-                quality=NORMALIZED_JPEG_QUALITY,
-
-                optimize=True
-
-            )
-
-            print(
-                "Normalized image saved successfully."
-            )
-
-            return {
-
-                "original_width":
-                    original_width,
-
-                "original_height":
-                    original_height,
-
-                "processed_width":
-                    new_width,
-
-                "processed_height":
-                    new_height
-
-            }
-
-    except Exception as e:
-
-        print(
-            "IMAGE NORMALIZATION ERROR:",
-            repr(e)
-        )
-
-        traceback.print_exc()
-
-        raise
-
-
-# =========================================================
-# 17. IMAGE QUALITY CHECK
+# 16. IMAGE QUALITY CHECK
 # =========================================================
 
 def check_image_quality(image_path):
 
     messages = []
 
+
     image = cv2.imread(
         image_path
     )
+
 
     if image is None:
 
@@ -577,24 +456,16 @@ def check_image_quality(image_path):
 
 
     gray = cv2.cvtColor(
-
         image,
-
         cv2.COLOR_BGR2GRAY
-
     )
 
 
     blur_score = float(
-
         cv2.Laplacian(
-
             gray,
-
             cv2.CV_64F
-
         ).var()
-
     )
 
 
@@ -622,6 +493,7 @@ def check_image_quality(image_path):
             "Please use better lighting."
 
         )
+
 
     elif brightness > MAX_BRIGHTNESS:
 
@@ -666,7 +538,7 @@ def check_image_quality(image_path):
 
 
 # =========================================================
-# 18. GRAD-CAM CLASS
+# 17. GRAD-CAM CLASS
 # =========================================================
 
 class GradCAM:
@@ -734,9 +606,7 @@ class GradCAM:
         class_index
     ):
 
-        self.model.zero_grad(
-            set_to_none=True
-        )
+        self.model.zero_grad()
 
 
         output = self.model(
@@ -762,10 +632,8 @@ class GradCAM:
                 gradients is None:
 
             raise RuntimeError(
-
                 "Grad-CAM activations or gradients "
                 "were not captured."
-
             )
 
 
@@ -834,7 +702,7 @@ class GradCAM:
 
 
 # =========================================================
-# 19. CREATE GRAD-CAM
+# 18. CREATE GRAD-CAM
 # =========================================================
 
 target_layer = (
@@ -849,7 +717,7 @@ gradcam = GradCAM(
 
 
 # =========================================================
-# 20. CREATE GRAD-CAM IMAGE
+# 19. CREATE GRAD-CAM IMAGE
 # =========================================================
 
 def create_gradcam(
@@ -867,55 +735,6 @@ def create_gradcam(
 
         raise ValueError(
             "Could not read image for Grad-CAM."
-        )
-
-
-    # -----------------------------------------------------
-    # The uploaded image has already been normalized to
-    # MAX_UPLOAD_DIMENSION.
-    #
-    # This additional protection prevents Grad-CAM from
-    # creating a huge heatmap if a large image somehow
-    # reaches this function.
-    # -----------------------------------------------------
-
-    height, width = original_image.shape[:2]
-
-    if max(
-        height,
-        width
-    ) > MAX_UPLOAD_DIMENSION:
-
-        scale = (
-
-            MAX_UPLOAD_DIMENSION
-            /
-            max(
-                height,
-                width
-            )
-
-        )
-
-        new_width = int(
-            width * scale
-        )
-
-        new_height = int(
-            height * scale
-        )
-
-        original_image = cv2.resize(
-
-            original_image,
-
-            (
-                new_width,
-                new_height
-            ),
-
-            interpolation=cv2.INTER_AREA
-
         )
 
 
@@ -961,12 +780,7 @@ def create_gradcam(
 
         cam,
 
-        (
-            width,
-            height
-        ),
-
-        interpolation=cv2.INTER_LINEAR
+        (width, height)
 
     )
 
@@ -1019,7 +833,7 @@ def create_gradcam(
 
 
 # =========================================================
-# 21. GATEKEEPER PREDICTION
+# 20. GATEKEEPER PREDICTION
 # =========================================================
 
 def check_tomato(
@@ -1040,7 +854,7 @@ def check_tomato(
     ).to(device)
 
 
-    with torch.inference_mode():
+    with torch.no_grad():
 
         outputs = gatekeeper(
             image_tensor
@@ -1112,7 +926,7 @@ def check_tomato(
 
 
 # =========================================================
-# 22. DISEASE PREDICTION
+# 21. DISEASE PREDICTION
 # =========================================================
 
 def predict(
@@ -1133,7 +947,7 @@ def predict(
     ).to(device)
 
 
-    with torch.inference_mode():
+    with torch.no_grad():
 
         outputs = model(
             image_tensor
@@ -1365,7 +1179,7 @@ def predict(
 
 
 # =========================================================
-# 23. HOME
+# 22. HOME
 # =========================================================
 
 @app.route("/")
@@ -1377,7 +1191,7 @@ def home():
 
 
 # =========================================================
-# 24. PREDICTION ROUTE
+# 23. PREDICTION ROUTE
 # =========================================================
 
 @app.route(
@@ -1389,712 +1203,169 @@ def prediction():
     global latest_result
 
 
-    try:
+    if "image" not in request.files:
 
-        # =================================================
-        # CHECK UPLOAD
-        # =================================================
-
-        if "image" not in request.files:
-
-            return (
-                "No image uploaded.",
-                400
-            )
-
-
-        file = request.files["image"]
-
-
-        if file.filename == "":
-
-            return (
-                "No image selected.",
-                400
-            )
-
-
-        original_filename = secure_filename(
-            file.filename
+        return (
+            "No image uploaded.",
+            400
         )
 
 
-        extension = os.path.splitext(
-            original_filename
-        )[1].lower()
+    file = request.files["image"]
 
 
-        allowed_extensions = {
+    if file.filename == "":
 
-            ".jpg",
-            ".jpeg",
-            ".png",
-            ".webp"
+        return (
+            "No image selected.",
+            400
+        )
+
+
+    original_filename = secure_filename(
+        file.filename
+    )
+
+
+    extension = os.path.splitext(
+        original_filename
+    )[1].lower()
+
+
+    allowed_extensions = {
+
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".webp"
+
+    }
+
+
+    if extension not in allowed_extensions:
+
+        return (
+
+            "Unsupported image format. "
+            "Please upload JPG, JPEG, PNG "
+            "or WEBP.",
+
+            400
+
+        )
+
+
+    unique_filename = (
+
+        str(uuid.uuid4())
+
+        + extension
+
+    )
+
+
+    filepath = os.path.join(
+
+        app.config[
+            "UPLOAD_FOLDER"
+        ],
+
+        unique_filename
+
+    )
+
+
+    file.save(
+        filepath
+    )
+
+
+    # =====================================================
+    # 1. IMAGE QUALITY CHECK
+    # =====================================================
+
+    quality = check_image_quality(
+        filepath
+    )
+
+
+    print("=" * 60)
+    print("IMAGE QUALITY")
+    print("=" * 60)
+
+    print(
+        "Resolution:",
+        quality["width"],
+        "x",
+        quality["height"]
+    )
+
+    print(
+        "Blur score:",
+        quality["blur_score"]
+    )
+
+    print(
+        "Brightness:",
+        quality["brightness"]
+    )
+
+    print(
+        "Quality valid:",
+        quality["valid"]
+    )
+
+
+    if not quality["valid"]:
+
+        quality_message = (
+            " ".join(
+                quality["messages"]
+            )
+        )
+
+
+        disease_info = {
+
+            "name":
+                "Image Quality Problem",
+
+            "description":
+                quality_message,
+
+            "symptoms": [],
+
+            "treatment": [
+
+                "Retake the photograph "
+                "under suitable lighting "
+                "with the leaf in focus."
+
+            ],
+
+            "prevention": [
+
+                "Hold the camera steady.",
+                "Avoid strong glare.",
+                "Capture the leaf clearly."
+
+            ]
 
         }
 
 
-        if extension not in allowed_extensions:
-
-            return (
-
-                "Unsupported image format. "
-                "Please upload JPG, JPEG, PNG "
-                "or WEBP.",
-
-                400
-
-            )
-
-
-        # =================================================
-        # SAVE TEMPORARY ORIGINAL
-        # =================================================
-
-        temporary_filename = (
-
-            "temp_"
-
-            + str(uuid.uuid4())
-
-            + extension
-
-        )
-
-
-        temporary_path = os.path.join(
-
-            app.config[
-                "UPLOAD_FOLDER"
-            ],
-
-            temporary_filename
-
-        )
-
-
-        file.save(
-            temporary_path
-        )
-
-
-        # =================================================
-        # NORMALIZE IMAGE
-        #
-        # IMPORTANT:
-        # All later processing uses the normalized image.
-        # =================================================
-
-        unique_filename = (
-
-            str(uuid.uuid4())
-
-            + ".jpg"
-
-        )
-
-
-        filepath = os.path.join(
-
-            app.config[
-                "UPLOAD_FOLDER"
-            ],
-
-            unique_filename
-
-        )
-
-
-        try:
-
-            normalization_info = (
-                normalize_uploaded_image(
-
-                    temporary_path,
-
-                    filepath
-
-                )
-            )
-
-        finally:
-
-            # Remove temporary original after normalization.
-            try:
-
-                if os.path.exists(
-                    temporary_path
-                ):
-
-                    os.remove(
-                        temporary_path
-                    )
-
-            except Exception as cleanup_error:
-
-                print(
-                    "Temporary file cleanup error:",
-                    cleanup_error
-                )
-
-
-        print("=" * 60)
-        print("UPLOAD PROCESSING")
-        print("=" * 60)
-
-        print(
-            "Original resolution:",
-            normalization_info[
-                "original_width"
-            ],
-            "x",
-            normalization_info[
-                "original_height"
-            ]
-        )
-
-        print(
-            "Processing resolution:",
-            normalization_info[
-                "processed_width"
-            ],
-            "x",
-            normalization_info[
-                "processed_height"
-            ]
-        )
-
-
-        # =================================================
-        # 1. IMAGE QUALITY CHECK
-        # =================================================
-
-        quality = check_image_quality(
-            filepath
-        )
-
-
-        print("=" * 60)
-        print("IMAGE QUALITY")
-        print("=" * 60)
-
-        print(
-            "Resolution:",
-            quality["width"],
-            "x",
-            quality["height"]
-        )
-
-        print(
-            "Blur score:",
-            quality["blur_score"]
-        )
-
-        print(
-            "Brightness:",
-            quality["brightness"]
-        )
-
-        print(
-            "Quality valid:",
-            quality["valid"]
-        )
-
-
-        if not quality["valid"]:
-
-            quality_message = (
-                " ".join(
-                    quality["messages"]
-                )
-            )
-
-
-            disease_info = {
-
-                "name":
-                    "Image Quality Problem",
-
-                "description":
-                    quality_message,
-
-                "symptoms": [],
-
-                "treatment": [
-
-                    "Retake the photograph "
-                    "under suitable lighting "
-                    "with the leaf in focus."
-
-                ],
-
-                "prevention": [
-
-                    "Hold the camera steady.",
-                    "Avoid strong glare.",
-                    "Capture the leaf clearly."
-
-                ]
-
-            }
-
-
-            latest_result = {
-
-                "disease":
-                    "Image Quality Problem",
-
-                "display_name":
-                    "Image Quality Problem",
-
-                "confidence":
-                    0.0,
-
-                "top3": [],
-
-                "image":
-                    filepath,
-
-                "image_filename":
-                    unique_filename,
-
-                "disease_info":
-                    disease_info,
-
-                "is_uncertain":
-                    True,
-
-                "uncertainty_message":
-                    quality_message,
-
-                "gradcam_filename":
-                    None,
-
-                "quality":
-                    quality
-
-            }
-
-
-            return render_template(
-
-                "result.html",
-
-                image=filepath,
-
-                image_filename=
-                    unique_filename,
-
-                prediction=
-                    "Image Quality Problem",
-
-                confidence=0.0,
-
-                disease_info=
-                    disease_info,
-
-                description=
-                    quality_message,
-
-                symptoms=[],
-
-                treatment=
-                    disease_info[
-                        "treatment"
-                    ],
-
-                prevention=
-                    disease_info[
-                        "prevention"
-                    ],
-
-                top3=[],
-
-                is_uncertain=True,
-
-                uncertainty_message=
-                    quality_message,
-
-                gradcam_filename=None
-
-            )
-
-
-        # =================================================
-        # 2. TOMATO GATEKEEPER
-        # =================================================
-
-        (
-
-            gate_result,
-
-            gate_confidence,
-
-            gate_predicted_class
-
-        ) = check_tomato(
-            filepath
-        )
-
-
-        print("=" * 60)
-        print("GATEKEEPER")
-        print("=" * 60)
-
-        print(
-            "Predicted class:",
-            gate_predicted_class
-        )
-
-        print(
-            "Tomato probability:",
-            gate_confidence,
-            "%"
-        )
-
-        print(
-            "Gatekeeper threshold:",
-            GATEKEEPER_THRESHOLD,
-            "%"
-        )
-
-        print(
-            "Decision:",
-            gate_result
-        )
-
-
-        if gate_result == "not_tomato":
-
-            disease_info = {
-
-                "name":
-                    "Tomato Leaf Not Detected",
-
-                "description":
-
-                    "The image did not meet the "
-                    "tomato-image confidence "
-                    "requirement. Please upload a "
-                    "clear image of a tomato leaf.",
-
-                "symptoms": [],
-
-                "treatment": [
-
-                    "Upload a clear tomato leaf image."
-
-                ],
-
-                "prevention": [
-
-                    "Make sure the leaf occupies "
-                    "a reasonable portion of the image."
-
-                ]
-
-            }
-
-
-            latest_result = {
-
-                "disease":
-                    "Tomato Leaf Not Detected",
-
-                "display_name":
-                    "Tomato Leaf Not Detected",
-
-                "confidence":
-                    gate_confidence,
-
-                "top3": [],
-
-                "image":
-                    filepath,
-
-                "image_filename":
-                    unique_filename,
-
-                "disease_info":
-                    disease_info,
-
-                "is_uncertain":
-                    True,
-
-                "uncertainty_message":
-
-                    "The image did not meet the "
-                    "tomato-image confidence "
-                    "requirement.",
-
-                "gradcam_filename":
-                    None,
-
-                "quality":
-                    quality
-
-            }
-
-
-            return render_template(
-
-                "result.html",
-
-                image=filepath,
-
-                image_filename=
-                    unique_filename,
-
-                prediction=
-                    "Tomato Leaf Not Detected",
-
-                confidence=
-                    gate_confidence,
-
-                disease_info=
-                    disease_info,
-
-                description=
-                    disease_info[
-                        "description"
-                    ],
-
-                symptoms=[],
-
-                treatment=
-                    disease_info[
-                        "treatment"
-                    ],
-
-                prevention=
-                    disease_info[
-                        "prevention"
-                    ],
-
-                top3=[],
-
-                is_uncertain=True,
-
-                uncertainty_message=
-
-                    "The image did not meet the "
-                    "tomato-image confidence "
-                    "requirement.",
-
-                gradcam_filename=None
-
-            )
-
-
-        # =================================================
-        # 3. DISEASE MODEL
-        # =================================================
-
-        result = predict(
-            filepath
-        )
-
-
-        disease = result[
-            "disease"
-        ]
-
-
-        confidence = result[
-            "confidence"
-        ]
-
-
-        top2_confidence = result[
-            "top2_confidence"
-        ]
-
-
-        margin = result[
-            "margin"
-        ]
-
-
-        top3 = result[
-            "top3"
-        ]
-
-
-        predicted_index = result[
-            "predicted_index"
-        ]
-
-
-        is_uncertain = result[
-            "is_uncertain"
-        ]
-
-
-        uncertainty_message = result[
-            "uncertainty_message"
-        ]
-
-
-        display_name = get_display_name(
-            disease
-        )
-
-
-        print("=" * 60)
-        print("DISEASE PREDICTION")
-        print("=" * 60)
-
-        print(
-            "Internal class:",
-            disease
-        )
-
-        print(
-            "Display name:",
-            display_name
-        )
-
-        print(
-            "Top-1 confidence:",
-            confidence,
-            "%"
-        )
-
-        print(
-            "Top-2 confidence:",
-            top2_confidence,
-            "%"
-        )
-
-        print(
-            "Top-1 / Top-2 margin:",
-            margin,
-            "%"
-        )
-
-        print(
-            "Uncertain:",
-            is_uncertain
-        )
-
-
-        # =================================================
-        # 4. DISEASE INFORMATION
-        # =================================================
-
-        disease_info = DISEASE_INFO.get(
-
-            disease,
-
-            {
-
-                "name":
-                    display_name,
-
-                "description":
-                    "No information available.",
-
-                "symptoms": [],
-
-                "treatment": [],
-
-                "prevention": []
-
-            }
-
-        )
-
-
-        disease_info = dict(
-            disease_info
-        )
-
-
-        disease_info["name"] = (
-            display_name
-        )
-
-
-        # =================================================
-        # 5. GRAD-CAM
-        # =================================================
-
-        gradcam_filename = (
-
-            "gradcam_"
-
-            + str(uuid.uuid4())
-
-            + ".jpg"
-
-        )
-
-
-        gradcam_path = os.path.join(
-
-            app.config[
-                "UPLOAD_FOLDER"
-            ],
-
-            gradcam_filename
-
-        )
-
-
-        try:
-
-            create_gradcam(
-
-                filepath,
-
-                predicted_index,
-
-                gradcam_path
-
-            )
-
-
-            print(
-                "Grad-CAM generated successfully."
-            )
-
-
-        except Exception as e:
-
-            print(
-                "Grad-CAM error:",
-                repr(e)
-            )
-
-            traceback.print_exc()
-
-
-            gradcam_filename = None
-
-
-        # =================================================
-        # 6. SAVE LATEST RESULT
-        # =================================================
-
         latest_result = {
 
             "disease":
-                disease,
+                "Image Quality Problem",
 
             "display_name":
-                display_name,
+                "Image Quality Problem",
 
             "confidence":
-                confidence,
+                0.0,
 
-            "top2_confidence":
-                top2_confidence,
-
-            "margin":
-                margin,
-
-            "top3":
-                top3,
+            "top3": [],
 
             "image":
                 filepath,
@@ -2105,30 +1376,20 @@ def prediction():
             "disease_info":
                 disease_info,
 
-            "predicted_index":
-                predicted_index,
-
             "is_uncertain":
-                is_uncertain,
+                True,
 
             "uncertainty_message":
-                uncertainty_message,
+                quality_message,
 
             "gradcam_filename":
-                gradcam_filename,
+                None,
 
             "quality":
-                quality,
-
-            "gatekeeper_confidence":
-                gate_confidence
+                quality
 
         }
 
-
-        # =================================================
-        # 7. RESULT PAGE
-        # =================================================
 
         return render_template(
 
@@ -2140,78 +1401,507 @@ def prediction():
                 unique_filename,
 
             prediction=
-                display_name,
+                "Image Quality Problem",
 
-            confidence=
-                confidence,
+            confidence=0.0,
 
             disease_info=
                 disease_info,
 
             description=
-                disease_info.get(
-                    "description",
-                    ""
-                ),
+                quality_message,
 
-            symptoms=
-                disease_info.get(
-                    "symptoms",
-                    []
-                ),
+            symptoms=[],
 
             treatment=
-                disease_info.get(
-                    "treatment",
-                    []
-                ),
+                disease_info[
+                    "treatment"
+                ],
 
             prevention=
-                disease_info.get(
-                    "prevention",
-                    []
-                ),
+                disease_info[
+                    "prevention"
+                ],
 
-            top3=
-                top3,
+            top3=[],
 
-            is_uncertain=
-                is_uncertain,
+            is_uncertain=True,
 
             uncertainty_message=
-                uncertainty_message,
+                quality_message,
 
-            gradcam_filename=
-                gradcam_filename
+            gradcam_filename=None
 
+        )
+
+
+    # =====================================================
+    # 2. TOMATO GATEKEEPER
+    # =====================================================
+
+    (
+
+        gate_result,
+
+        gate_confidence,
+
+        gate_predicted_class
+
+    ) = check_tomato(
+        filepath
+    )
+
+
+    print("=" * 60)
+    print("GATEKEEPER")
+    print("=" * 60)
+
+    print(
+        "Predicted class:",
+        gate_predicted_class
+    )
+
+    print(
+        "Tomato probability:",
+        gate_confidence,
+        "%"
+    )
+
+    print(
+        "Gatekeeper threshold:",
+        GATEKEEPER_THRESHOLD,
+        "%"
+    )
+
+    print(
+        "Decision:",
+        gate_result
+    )
+
+
+    if gate_result == "not_tomato":
+
+        disease_info = {
+
+            "name":
+                "Tomato Leaf Not Detected",
+
+            "description":
+
+                "The image did not meet the "
+                "tomato-image confidence "
+                "requirement. Please upload a "
+                "clear image of a tomato leaf.",
+
+            "symptoms": [],
+
+            "treatment": [
+
+                "Upload a clear tomato leaf image."
+
+            ],
+
+            "prevention": [
+
+                "Make sure the leaf occupies "
+                "a reasonable portion of the image."
+
+            ]
+
+        }
+
+
+        latest_result = {
+
+            "disease":
+                "Tomato Leaf Not Detected",
+
+            "display_name":
+                "Tomato Leaf Not Detected",
+
+            "confidence":
+                gate_confidence,
+
+            "top3": [],
+
+            "image":
+                filepath,
+
+            "image_filename":
+                unique_filename,
+
+            "disease_info":
+                disease_info,
+
+            "is_uncertain":
+                True,
+
+            "uncertainty_message":
+
+                "The image did not meet the "
+                "tomato-image confidence "
+                "requirement.",
+
+            "gradcam_filename":
+                None,
+
+            "quality":
+                quality
+
+        }
+
+
+        return render_template(
+
+            "result.html",
+
+            image=filepath,
+
+            image_filename=
+                unique_filename,
+
+            prediction=
+                "Tomato Leaf Not Detected",
+
+            confidence=
+                gate_confidence,
+
+            disease_info=
+                disease_info,
+
+            description=
+                disease_info[
+                    "description"
+                ],
+
+            symptoms=[],
+
+            treatment=
+                disease_info[
+                    "treatment"
+                ],
+
+            prevention=
+                disease_info[
+                    "prevention"
+                ],
+
+            top3=[],
+
+            is_uncertain=True,
+
+            uncertainty_message=
+
+                "The image did not meet the "
+                "tomato-image confidence "
+                "requirement.",
+
+            gradcam_filename=None
+
+        )
+
+
+    # =====================================================
+    # 3. DISEASE MODEL
+    # =====================================================
+
+    result = predict(
+        filepath
+    )
+
+
+    disease = result[
+        "disease"
+    ]
+
+
+    confidence = result[
+        "confidence"
+    ]
+
+
+    top2_confidence = result[
+        "top2_confidence"
+    ]
+
+
+    margin = result[
+        "margin"
+    ]
+
+
+    top3 = result[
+        "top3"
+    ]
+
+
+    predicted_index = result[
+        "predicted_index"
+    ]
+
+
+    is_uncertain = result[
+        "is_uncertain"
+    ]
+
+
+    uncertainty_message = result[
+        "uncertainty_message"
+    ]
+
+
+    display_name = get_display_name(
+        disease
+    )
+
+
+    print("=" * 60)
+    print("DISEASE PREDICTION")
+    print("=" * 60)
+
+    print(
+        "Internal class:",
+        disease
+    )
+
+    print(
+        "Display name:",
+        display_name
+    )
+
+    print(
+        "Top-1 confidence:",
+        confidence,
+        "%"
+    )
+
+    print(
+        "Top-2 confidence:",
+        top2_confidence,
+        "%"
+    )
+
+    print(
+        "Top-1 / Top-2 margin:",
+        margin,
+        "%"
+    )
+
+    print(
+        "Uncertain:",
+        is_uncertain
+    )
+
+
+    # =====================================================
+    # 4. DISEASE INFORMATION
+    # =====================================================
+
+    disease_info = DISEASE_INFO.get(
+
+        disease,
+
+        {
+
+            "name":
+                display_name,
+
+            "description":
+                "No information available.",
+
+            "symptoms": [],
+
+            "treatment": [],
+
+            "prevention": []
+
+        }
+
+    )
+
+
+    disease_info = dict(
+        disease_info
+    )
+
+
+    disease_info["name"] = (
+        display_name
+    )
+
+
+    # =====================================================
+    # 5. GRAD-CAM
+    # =====================================================
+
+    gradcam_filename = (
+
+        "gradcam_"
+
+        + str(uuid.uuid4())
+
+        + ".jpg"
+
+    )
+
+
+    gradcam_path = os.path.join(
+
+        app.config[
+            "UPLOAD_FOLDER"
+        ],
+
+        gradcam_filename
+
+    )
+
+
+    try:
+
+        create_gradcam(
+
+            filepath,
+
+            predicted_index,
+
+            gradcam_path
+
+        )
+
+
+        print(
+            "Grad-CAM generated successfully."
         )
 
 
     except Exception as e:
 
-        print("=" * 60)
-        print("PREDICTION ROUTE ERROR")
-        print("=" * 60)
-
         print(
-            "Error:",
-            repr(e)
+            "Grad-CAM error:",
+            str(e)
         )
 
-        traceback.print_exc()
 
-        return (
+        gradcam_filename = None
 
-            "Prediction failed because of an internal "
-            "server error. Please try another image.",
 
-            500
+    # =====================================================
+    # 6. SAVE LATEST RESULT
+    # =====================================================
 
-        )
+    latest_result = {
+
+        "disease":
+            disease,
+
+        "display_name":
+            display_name,
+
+        "confidence":
+            confidence,
+
+        "top2_confidence":
+            top2_confidence,
+
+        "margin":
+            margin,
+
+        "top3":
+            top3,
+
+        "image":
+            filepath,
+
+        "image_filename":
+            unique_filename,
+
+        "disease_info":
+            disease_info,
+
+        "predicted_index":
+            predicted_index,
+
+        "is_uncertain":
+            is_uncertain,
+
+        "uncertainty_message":
+            uncertainty_message,
+
+        "gradcam_filename":
+            gradcam_filename,
+
+        "quality":
+            quality,
+
+        "gatekeeper_confidence":
+            gate_confidence
+
+    }
+
+
+    # =====================================================
+    # 7. RESULT PAGE
+    # =====================================================
+
+    return render_template(
+
+        "result.html",
+
+        image=filepath,
+
+        image_filename=
+            unique_filename,
+
+        prediction=
+            display_name,
+
+        confidence=
+            confidence,
+
+        disease_info=
+            disease_info,
+
+        description=
+            disease_info.get(
+                "description",
+                ""
+            ),
+
+        symptoms=
+            disease_info.get(
+                "symptoms",
+                []
+            ),
+
+        treatment=
+            disease_info.get(
+                "treatment",
+                []
+            ),
+
+        prevention=
+            disease_info.get(
+                "prevention",
+                []
+            ),
+
+        top3=
+            top3,
+
+        is_uncertain=
+            is_uncertain,
+
+        uncertainty_message=
+            uncertainty_message,
+
+        gradcam_filename=
+            gradcam_filename
+
+    )
 
 
 # =========================================================
-# 25. ABOUT
+# 24. ABOUT
 # =========================================================
 
 @app.route("/about")
@@ -2223,7 +1913,7 @@ def about():
 
 
 # =========================================================
-# 26. DISEASE INFORMATION PAGE
+# 25. DISEASE INFORMATION PAGE
 # =========================================================
 
 @app.route(
@@ -2261,7 +1951,7 @@ def disease_page(
 
 
 # =========================================================
-# 27. PROFESSIONAL PDF REPORT
+# 26. PROFESSIONAL PDF REPORT
 # =========================================================
 
 @app.route("/download")
@@ -2281,6 +1971,10 @@ def download_report():
 
         )
 
+
+    # =====================================================
+    # GET DATA
+    # =====================================================
 
     disease = latest_result[
         "disease"
@@ -2354,6 +2048,10 @@ def download_report():
     )
 
 
+    # =====================================================
+    # REPORT PATH
+    # =====================================================
+
     report_filename = (
         "tomato_disease_report.pdf"
     )
@@ -2367,6 +2065,10 @@ def download_report():
 
     )
 
+
+    # =====================================================
+    # PROFESSIONAL PDF COLOURS
+    # =====================================================
 
     CREAM = colors.HexColor(
         "#FFF9DC"
@@ -2388,6 +2090,10 @@ def download_report():
         "#F3EDB3"
     )
 
+    WARM_BEIGE = colors.HexColor(
+        "#F3DFB0"
+    )
+
     WHITE = colors.white
 
     BORDER = colors.HexColor(
@@ -2399,6 +2105,10 @@ def download_report():
     )
 
 
+    # =====================================================
+    # PDF BACKGROUND + HEADER/FOOTER
+    # =====================================================
+
     def draw_pdf_page(
         canvas,
         document
@@ -2406,6 +2116,10 @@ def download_report():
 
         canvas.saveState()
 
+
+        # -------------------------------------------------
+        # Full cream background
+        # -------------------------------------------------
 
         canvas.setFillColor(
             CREAM
@@ -2424,6 +2138,10 @@ def download_report():
         )
 
 
+        # -------------------------------------------------
+        # Top green header strip
+        # -------------------------------------------------
+
         canvas.setFillColor(
             DARK_GREEN
         )
@@ -2441,6 +2159,10 @@ def download_report():
 
         )
 
+
+        # -------------------------------------------------
+        # Header text
+        # -------------------------------------------------
 
         canvas.setFillColor(
             WHITE
@@ -2478,6 +2200,10 @@ def download_report():
         )
 
 
+        # -------------------------------------------------
+        # Footer line
+        # -------------------------------------------------
+
         canvas.setStrokeColor(
             BORDER
         )
@@ -2496,6 +2222,10 @@ def download_report():
 
         )
 
+
+        # -------------------------------------------------
+        # Footer text
+        # -------------------------------------------------
 
         canvas.setFillColor(
             GREY
@@ -2529,6 +2259,10 @@ def download_report():
         canvas.restoreState()
 
 
+    # =====================================================
+    # PDF DOCUMENT
+    # =====================================================
+
     doc = SimpleDocTemplate(
 
         report_path,
@@ -2545,6 +2279,10 @@ def download_report():
 
     )
 
+
+    # =====================================================
+    # STYLES
+    # =====================================================
 
     styles = getSampleStyleSheet()
 
@@ -2684,6 +2422,25 @@ def download_report():
     )
 
 
+    prediction_style = ParagraphStyle(
+
+        "PredictionName",
+
+        parent=styles["BodyText"],
+
+        alignment=TA_CENTER,
+
+        fontName="Helvetica-Bold",
+
+        fontSize=17,
+
+        leading=21,
+
+        textColor=DARK_GREEN
+
+    )
+
+
     confidence_style = ParagraphStyle(
 
         "ConfidenceStyle",
@@ -2703,8 +2460,16 @@ def download_report():
     )
 
 
+    # =====================================================
+    # STORY
+    # =====================================================
+
     story = []
 
+
+    # =====================================================
+    # REPORT TITLE
+    # =====================================================
 
     story.append(
         Spacer(
@@ -2746,6 +2511,10 @@ def download_report():
 
     )
 
+
+    # =====================================================
+    # REPORT META INFORMATION
+    # =====================================================
 
     meta_data = [
 
@@ -3015,23 +2784,6 @@ def download_report():
     )
 
 
-    prediction_white_style = ParagraphStyle(
-
-        "PredictionWhite",
-
-        parent=normal_style,
-
-        fontName="Helvetica-Bold",
-
-        fontSize=11,
-
-        textColor=WHITE,
-
-        alignment=TA_CENTER
-
-    )
-
-
     prediction_data = [
 
         [
@@ -3048,7 +2800,21 @@ def download_report():
 
                 escape(display_name),
 
-                prediction_white_style
+                ParagraphStyle(
+
+                    "PredictionWhite",
+
+                    parent=normal_style,
+
+                    fontName="Helvetica-Bold",
+
+                    fontSize=11,
+
+                    textColor=WHITE,
+
+                    alignment=TA_CENTER
+
+                )
 
             )
 
@@ -3633,37 +3399,1347 @@ def download_report():
 
 
     # =====================================================
-    # HELPER FOR PDF LIST SECTIONS
+    # SYMPTOMS
     # =====================================================
 
-    def create_pdf_list_table(items):
+    symptoms = disease_info.get(
 
-        content = []
+        "symptoms",
+
+        []
+
+    )
 
 
-        if items:
+    story.append(
 
-            for item in items:
+        Paragraph(
 
-                content.append(
+            "Symptoms",
 
-                    Paragraph(
+            section_style
 
-                        "• "
-                        + escape(
-                            str(item)
-                        ),
+        )
 
-                        normal_style
+    )
 
-                    )
 
-                )
+    symptoms_content = []
 
-        else:
 
-            content.append(
+    if symptoms:
+
+        for symptom in symptoms:
+
+            symptoms_content.append(
 
                 Paragraph(
 
-                    "
+                    "• "
+                    + escape(
+                        str(symptom)
+                    ),
+
+                    normal_style
+
+                )
+
+            )
+
+    else:
+
+        symptoms_content.append(
+
+            Paragraph(
+
+                "No symptoms information available.",
+
+                normal_style
+
+            )
+
+        )
+
+
+    symptoms_table = Table(
+
+        [
+
+            [
+
+                symptoms_content
+
+            ]
+
+        ],
+
+        colWidths=[
+
+            163 * mm
+
+        ]
+
+    )
+
+
+    symptoms_table.setStyle(
+
+        TableStyle([
+
+            (
+                "BACKGROUND",
+                (0, 0),
+                (-1, -1),
+                WHITE
+            ),
+
+            (
+                "BOX",
+                (0, 0),
+                (-1, -1),
+                0.7,
+                BORDER
+            ),
+
+            (
+                "LEFTPADDING",
+                (0, 0),
+                (-1, -1),
+                10
+            ),
+
+            (
+                "RIGHTPADDING",
+                (0, 0),
+                (-1, -1),
+                10
+            ),
+
+            (
+                "TOPPADDING",
+                (0, 0),
+                (-1, -1),
+                8
+            ),
+
+            (
+                "BOTTOMPADDING",
+                (0, 0),
+                (-1, -1),
+                8
+            )
+
+        ])
+
+    )
+
+
+    story.append(
+        symptoms_table
+    )
+
+
+    # =====================================================
+    # TREATMENT
+    # =====================================================
+
+    treatment = disease_info.get(
+
+        "treatment",
+
+        []
+
+    )
+
+
+    story.append(
+
+        Paragraph(
+
+            "Treatment / Management",
+
+            section_style
+
+        )
+
+    )
+
+
+    treatment_content = []
+
+
+    if treatment:
+
+        for item in treatment:
+
+            treatment_content.append(
+
+                Paragraph(
+
+                    "• "
+                    + escape(
+                        str(item)
+                    ),
+
+                    normal_style
+
+                )
+
+            )
+
+    else:
+
+        treatment_content.append(
+
+            Paragraph(
+
+                "No treatment information available.",
+
+                normal_style
+
+            )
+
+        )
+
+
+    treatment_table = Table(
+
+        [
+
+            [
+
+                treatment_content
+
+            ]
+
+        ],
+
+        colWidths=[
+
+            163 * mm
+
+        ]
+
+    )
+
+
+    treatment_table.setStyle(
+
+        TableStyle([
+
+            (
+                "BACKGROUND",
+                (0, 0),
+                (-1, -1),
+                WHITE
+            ),
+
+            (
+                "BOX",
+                (0, 0),
+                (-1, -1),
+                0.7,
+                BORDER
+            ),
+
+            (
+                "LEFTPADDING",
+                (0, 0),
+                (-1, -1),
+                10
+            ),
+
+            (
+                "RIGHTPADDING",
+                (0, 0),
+                (-1, -1),
+                10
+            ),
+
+            (
+                "TOPPADDING",
+                (0, 0),
+                (-1, -1),
+                8
+            ),
+
+            (
+                "BOTTOMPADDING",
+                (0, 0),
+                (-1, -1),
+                8
+            )
+
+        ])
+
+    )
+
+
+    story.append(
+        treatment_table
+    )
+
+
+    # =====================================================
+    # PREVENTION
+    # =====================================================
+
+    prevention = disease_info.get(
+
+        "prevention",
+
+        []
+
+    )
+
+
+    story.append(
+
+        Paragraph(
+
+            "Prevention",
+
+            section_style
+
+        )
+
+    )
+
+
+    prevention_content = []
+
+
+    if prevention:
+
+        for item in prevention:
+
+            prevention_content.append(
+
+                Paragraph(
+
+                    "• "
+                    + escape(
+                        str(item)
+                    ),
+
+                    normal_style
+
+                )
+
+            )
+
+    else:
+
+        prevention_content.append(
+
+            Paragraph(
+
+                "No prevention information available.",
+
+                normal_style
+
+            )
+
+        )
+
+
+    prevention_table = Table(
+
+        [
+
+            [
+
+                prevention_content
+
+            ]
+
+        ],
+
+        colWidths=[
+
+            163 * mm
+
+        ]
+
+    )
+
+
+    prevention_table.setStyle(
+
+        TableStyle([
+
+            (
+                "BACKGROUND",
+                (0, 0),
+                (-1, -1),
+                WHITE
+            ),
+
+            (
+                "BOX",
+                (0, 0),
+                (-1, -1),
+                0.7,
+                BORDER
+            ),
+
+            (
+                "LEFTPADDING",
+                (0, 0),
+                (-1, -1),
+                10
+            ),
+
+            (
+                "RIGHTPADDING",
+                (0, 0),
+                (-1, -1),
+                10
+            ),
+
+            (
+                "TOPPADDING",
+                (0, 0),
+                (-1, -1),
+                8
+            ),
+
+            (
+                "BOTTOMPADDING",
+                (0, 0),
+                (-1, -1),
+                8
+            )
+
+        ])
+
+    )
+
+
+    story.append(
+        prevention_table
+    )
+
+
+    # =====================================================
+    # TOP 3 PREDICTIONS
+    # =====================================================
+
+    story.append(
+
+        Paragraph(
+
+            "Top 3 Model Predictions",
+
+            section_style
+
+        )
+
+    )
+
+
+    table_data = [
+
+        [
+
+            Paragraph(
+                "<b>Rank</b>",
+                center_style
+            ),
+
+            Paragraph(
+                "<b>Condition</b>",
+                center_style
+            ),
+
+            Paragraph(
+                "<b>Confidence</b>",
+                center_style
+            )
+
+        ]
+
+    ]
+
+
+    for rank, item in enumerate(
+
+        top3,
+
+        start=1
+
+    ):
+
+        display_top3_name = item.get(
+
+            "name",
+
+            get_display_name(
+
+                item.get(
+                    "class_name",
+                    ""
+                )
+
+            )
+
+        )
+
+
+        table_data.append([
+
+            Paragraph(
+
+                str(rank),
+
+                center_style
+
+            ),
+
+            Paragraph(
+
+                escape(
+                    display_top3_name
+                ),
+
+                normal_style
+
+            ),
+
+            Paragraph(
+
+                f'{item["confidence"]:.2f}%',
+
+                center_style
+
+            )
+
+        ])
+
+
+    top3_table = Table(
+
+        table_data,
+
+        colWidths=[
+
+            20 * mm,
+
+            105 * mm,
+
+            38 * mm
+
+        ],
+
+        repeatRows=1
+
+    )
+
+
+    top3_table.setStyle(
+
+        TableStyle([
+
+            (
+                "BACKGROUND",
+                (0, 0),
+                (-1, 0),
+                GREEN
+            ),
+
+            (
+                "TEXTCOLOR",
+                (0, 0),
+                (-1, 0),
+                WHITE
+            ),
+
+            (
+                "GRID",
+                (0, 0),
+                (-1, -1),
+                0.5,
+                BORDER
+            ),
+
+            (
+                "BACKGROUND",
+                (0, 1),
+                (-1, -1),
+                WHITE
+            ),
+
+            (
+                "VALIGN",
+                (0, 0),
+                (-1, -1),
+                "MIDDLE"
+            ),
+
+            (
+                "ALIGN",
+                (0, 0),
+                (0, -1),
+                "CENTER"
+            ),
+
+            (
+                "ALIGN",
+                (-1, 0),
+                (-1, -1),
+                "CENTER"
+            ),
+
+            (
+                "LEFTPADDING",
+                (0, 0),
+                (-1, -1),
+                7
+            ),
+
+            (
+                "RIGHTPADDING",
+                (0, 0),
+                (-1, -1),
+                7
+            ),
+
+            (
+                "TOPPADDING",
+                (0, 0),
+                (-1, -1),
+                7
+            ),
+
+            (
+                "BOTTOMPADDING",
+                (0, 0),
+                (-1, -1),
+                7
+            )
+
+        ])
+
+    )
+
+
+    story.append(
+        top3_table
+    )
+
+
+    # =====================================================
+    # IMPORTANT DISCLAIMER
+    # =====================================================
+
+    story.append(
+        Spacer(
+            1,
+            7 * mm
+        )
+    )
+
+
+    disclaimer_style = ParagraphStyle(
+
+        "Disclaimer",
+
+        parent=normal_style,
+
+        fontName="Helvetica",
+
+        fontSize=8,
+
+        leading=12,
+
+        textColor=GREY,
+
+        alignment=TA_LEFT
+
+    )
+
+
+    disclaimer_table = Table(
+
+        [[
+
+            Paragraph(
+
+                "<b>Important:</b> This report provides "
+                "AI-assisted image classification and "
+                "agricultural information. It should not "
+                "replace confirmation by a qualified "
+                "agricultural professional, especially "
+                "when symptoms are unclear or predictions "
+                "have low confidence.",
+
+                disclaimer_style
+
+            )
+
+        ]],
+
+        colWidths=[
+
+            163 * mm
+
+        ]
+
+    )
+
+
+    disclaimer_table.setStyle(
+
+        TableStyle([
+
+            (
+                "BACKGROUND",
+                (0, 0),
+                (-1, -1),
+                LIGHT_YELLOW
+            ),
+
+            (
+                "BOX",
+                (0, 0),
+                (-1, -1),
+                0.7,
+                BORDER
+            ),
+
+            (
+                "LEFTPADDING",
+                (0, 0),
+                (-1, -1),
+                10
+            ),
+
+            (
+                "RIGHTPADDING",
+                (0, 0),
+                (-1, -1),
+                10
+            ),
+
+            (
+                "TOPPADDING",
+                (0, 0),
+                (-1, -1),
+                8
+            ),
+
+            (
+                "BOTTOMPADDING",
+                (0, 0),
+                (-1, -1),
+                8
+            )
+
+        ])
+
+    )
+
+
+    story.append(
+        disclaimer_table
+    )
+
+
+    # =====================================================
+    # BUILD PROFESSIONAL PDF
+    # =====================================================
+
+    doc.build(
+
+        story,
+
+        onFirstPage=draw_pdf_page,
+
+        onLaterPages=draw_pdf_page
+
+    )
+
+
+    # =====================================================
+    # SEND PDF
+    # =====================================================
+
+    return send_file(
+
+        report_path,
+
+        as_attachment=True
+
+    )
+
+
+# =========================================================
+# 27. EXTERNAL VALIDATION
+# =========================================================
+
+def evaluate_external_dataset(
+    dataset_dir
+):
+
+    if not os.path.exists(
+        dataset_dir
+    ):
+
+        raise FileNotFoundError(
+
+            f"External validation directory "
+            f"not found: {dataset_dir}"
+
+        )
+
+
+    y_true = []
+
+    y_pred = []
+
+
+    for class_index, class_name in enumerate(
+
+        CLASS_NAMES
+
+    ):
+
+        class_folder = os.path.join(
+
+            dataset_dir,
+
+            class_name
+
+        )
+
+
+        if not os.path.isdir(
+            class_folder
+        ):
+
+            print(
+
+                "WARNING: Missing class folder:",
+
+                class_folder
+
+            )
+
+            continue
+
+
+        for filename in os.listdir(
+            class_folder
+        ):
+
+            filepath = os.path.join(
+
+                class_folder,
+
+                filename
+
+            )
+
+
+            if not os.path.isfile(
+                filepath
+            ):
+
+                continue
+
+
+            extension = os.path.splitext(
+                filename
+            )[1].lower()
+
+
+            if extension not in {
+
+                ".jpg",
+                ".jpeg",
+                ".png",
+                ".webp"
+
+            }:
+
+                continue
+
+
+            try:
+
+                image = Image.open(
+                    filepath
+                ).convert(
+                    "RGB"
+                )
+
+
+                image_tensor = transform(
+                    image
+                ).unsqueeze(
+                    0
+                ).to(device)
+
+
+                with torch.no_grad():
+
+                    outputs = model(
+                        image_tensor
+                    )
+
+
+                    predicted_index = torch.argmax(
+
+                        outputs,
+
+                        dim=1
+
+                    ).item()
+
+
+                y_true.append(
+                    class_index
+                )
+
+
+                y_pred.append(
+                    predicted_index
+                )
+
+
+            except Exception as e:
+
+                print(
+
+                    "Evaluation error:",
+
+                    filepath,
+
+                    e
+
+                )
+
+
+    if len(y_true) == 0:
+
+        raise ValueError(
+
+            "No valid images were found "
+            "in the external validation dataset."
+
+        )
+
+
+    accuracy = accuracy_score(
+
+        y_true,
+
+        y_pred
+
+    )
+
+
+    precision = precision_score(
+
+        y_true,
+
+        y_pred,
+
+        average="weighted",
+
+        zero_division=0
+
+    )
+
+
+    recall = recall_score(
+
+        y_true,
+
+        y_pred,
+
+        average="weighted",
+
+        zero_division=0
+
+    )
+
+
+    f1 = f1_score(
+
+        y_true,
+
+        y_pred,
+
+        average="weighted",
+
+        zero_division=0
+
+    )
+
+
+    cm = confusion_matrix(
+
+        y_true,
+
+        y_pred,
+
+        labels=list(
+            range(
+                len(CLASS_NAMES)
+            )
+        )
+
+    )
+
+
+    report = classification_report(
+
+        y_true,
+
+        y_pred,
+
+        labels=list(
+            range(
+                len(CLASS_NAMES)
+            )
+        ),
+
+        target_names=[
+
+            get_display_name(
+                name
+            )
+
+            for name in CLASS_NAMES
+
+        ],
+
+        zero_division=0,
+
+        output_dict=True
+
+    )
+
+
+    cm_path = os.path.join(
+
+        "static",
+
+        "external_confusion_matrix.png"
+
+    )
+
+
+    cm_normalized = (
+
+        cm.astype(float)
+
+        /
+
+        np.maximum(
+
+            cm.sum(
+                axis=1,
+                keepdims=True
+            ),
+
+            1
+
+        )
+
+    )
+
+
+    cm_image = (
+
+        cm_normalized * 255
+
+    ).astype(
+        np.uint8
+    )
+
+
+    cm_image = cv2.resize(
+
+        cm_image,
+
+        (
+
+            max(
+                600,
+                len(CLASS_NAMES) * 70
+            ),
+
+            max(
+                600,
+                len(CLASS_NAMES) * 70
+            )
+
+        ),
+
+        interpolation=cv2.INTER_NEAREST
+
+    )
+
+
+    cm_image = cv2.applyColorMap(
+
+        cm_image,
+
+        cv2.COLORMAP_BLU
+
+    )
+
+
+    cv2.imwrite(
+
+        cm_path,
+
+        cm_image
+
+    )
+
+
+    return {
+
+        "number_of_images":
+            len(y_true),
+
+        "accuracy":
+            round(
+                accuracy * 100,
+                2
+            ),
+
+        "precision":
+            round(
+                precision * 100,
+                2
+            ),
+
+        "recall":
+            round(
+                recall * 100,
+                2
+            ),
+
+        "f1_score":
+            round(
+                f1 * 100,
+                2
+            ),
+
+        "classification_report":
+            report,
+
+        "confusion_matrix":
+            cm.tolist(),
+
+        "confusion_matrix_path":
+            cm_path
+
+    }
+
+
+# =========================================================
+# 28. EVALUATION ROUTE
+# =========================================================
+
+@app.route("/evaluate")
+def evaluate():
+
+    try:
+
+        results = evaluate_external_dataset(
+
+            EXTERNAL_VALIDATION_DIR
+
+        )
+
+
+        return {
+
+            "status":
+                "success",
+
+            "dataset":
+                EXTERNAL_VALIDATION_DIR,
+
+            "number_of_images":
+                results[
+                    "number_of_images"
+                ],
+
+            "accuracy":
+                results[
+                    "accuracy"
+                ],
+
+            "precision":
+                results[
+                    "precision"
+                ],
+
+            "recall":
+                results[
+                    "recall"
+                ],
+
+            "f1_score":
+                results[
+                    "f1_score"
+                ],
+
+            "confusion_matrix":
+                results[
+                    "confusion_matrix"
+                ],
+
+            "confusion_matrix_file":
+                results[
+                    "confusion_matrix_path"
+                ]
+
+        }
+
+
+    except Exception as e:
+
+        return {
+
+            "status":
+                "error",
+
+            "message":
+                str(e)
+
+        }, 500
+
+
+# =========================================================
+# 29. HEALTH CHECK
+# =========================================================
+
+@app.route("/health")
+def health():
+
+    return {
+
+        "status":
+            "ok",
+
+        "device":
+            str(device),
+
+        "disease_model":
+            "ResNet18",
+
+        "gatekeeper_model":
+            "ResNet18",
+
+        "gradcam":
+            "enabled",
+
+        "image_quality_check":
+            "enabled",
+
+        "uncertainty_margin":
+            "enabled",
+
+        "gatekeeper_threshold":
+            GATEKEEPER_THRESHOLD,
+
+        "disease_confidence_threshold":
+            UNCERTAINTY_THRESHOLD,
+
+        "margin_threshold":
+            MARGIN_THRESHOLD
+
+    }
+
+
+# =========================================================
+# 30. ERROR HANDLERS
+# =========================================================
+
+@app.errorhandler(404)
+def page_not_found(error):
+
+    return (
+
+        "Page not found.",
+
+        404
+
+    )
+
+
+@app.errorhandler(500)
+def internal_server_error(error):
+
+    return (
+
+        "Internal server error. "
+        "Please try again.",
+
+        500
+
+    )
+
+
+# =========================================================
+# 31. RUN APPLICATION
+# =========================================================
+
+if __name__ == "__main__":
+
+    print("=" * 60)
+    print("MVIKELI WEZITSHALO")
+    print("Tomato Disease Recognition System")
+    print("=" * 60)
+
+    print(
+        "Disease confidence threshold:",
+        UNCERTAINTY_THRESHOLD,
+        "%"
+    )
+
+    print(
+        "Top-2 margin threshold:",
+        MARGIN_THRESHOLD,
+        "%"
+    )
+
+    print(
+        "Gatekeeper threshold:",
+        GATEKEEPER_THRESHOLD,
+        "%"
+    )
+
+    print(
+        "Image quality checking: ENABLED"
+    )
+
+    print(
+        "Grad-CAM: ENABLED"
+    )
+
+    print(
+        "External evaluation: ENABLED"
+    )
+
+    print(
+        "Prediction history: NOT YET ADDED"
+    )
+
+    print("=" * 60)
+
+
+    app.run(
+
+        debug=False,
+
+        use_reloader=False
+
+    )
