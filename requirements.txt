@@ -6,3 +6,4 @@ matplotlib==3.10.6
 scikit-learn
 opencv-python-headless
 gunicorn
+reportlab
