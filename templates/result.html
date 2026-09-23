@@ -2,126 +2,109 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Prediction Result | Mvikeli Wezitshalo</title>
 
-    <!-- Result Page CSS -->
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/result.css') }}">
 
-    <!-- Font Awesome -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
 </head>
 
 
 <body>
 
-
-    <!-- =========================
-         NAVIGATION BAR
-    ========================== -->
+    <!-- =====================================================
+         NAVBAR
+         ===================================================== -->
 
     <nav class="navbar">
 
         <div class="nav-logo">
-
             <i class="fa-solid fa-seedling"></i>
-
             <span>Mvikeli Wezitshalo</span>
-
         </div>
 
-
         <a href="/" class="back-home">
-
             <i class="fa-solid fa-arrow-left"></i>
-
             Back Home
-
         </a>
 
     </nav>
 
 
 
-    <!-- =========================
-         MAIN RESULT SECTION
-    ========================== -->
+    <!-- =====================================================
+         MAIN RESULT PAGE
+         ===================================================== -->
 
     <main class="result-section">
 
         <div class="result-container">
 
 
-            <!-- =========================
-                 RESULT HEADING
-            ========================== -->
+            <!-- =================================================
+                 PAGE HEADING
+                 ================================================= -->
 
-            <div class="result-heading">
+            <header class="result-heading">
 
                 <span class="result-tag">
-
                     <i class="fa-solid fa-circle-check"></i>
-
                     AI Analysis Complete
-
                 </span>
 
-
                 <h1>
-
                     Plant Disease
-
                     <span>Detection Result</span>
-
                 </h1>
 
-
                 <p>
-
                     Our AI model has analyzed your uploaded
                     tomato plant image and generated the result below.
-
                 </p>
 
-            </div>
+            </header>
 
 
 
-            <!-- =========================
-                 MAIN RESULT CARD
-            ========================== -->
+            <!-- =================================================
+                 IMAGE ANALYSIS
+                 
+                 ORDER:
+                 1. Original Image
+                 2. AI Visual Explanation
+                 ================================================= -->
 
-            <div class="result-card">
+            <section class="image-comparison">
 
 
-                <!-- =========================
-                     UPLOADED IMAGE
-                ========================== -->
+                <!-- ORIGINAL IMAGE -->
 
-                <div class="result-image-section">
+                <div class="comparison-item">
 
-                    <div class="image-title">
+                    <div class="comparison-title">
 
                         <i class="fa-solid fa-image"></i>
 
-                        Uploaded Image
+                        <h2>
+                            Original Image
+                        </h2>
 
                     </div>
 
 
-                    <div class="result-image">
+                    <div class="comparison-image">
 
                         <img
-                            src="{{ url_for('static', filename=image.replace('\\', '/').replace('static/', '')) }}"
-                            alt="Uploaded tomato plant image"
-                        >
+                            src="{{ url_for(
+                                'static',
+                                filename=image.replace('\\', '/').replace('static/', '')
+                            ) }}"
+                            alt="Uploaded tomato plant image">
 
                     </div>
 
@@ -129,62 +112,278 @@
 
 
 
-                <!-- =========================
-                     RESULT INFORMATION
-                ========================== -->
+                <!-- AI VISUAL EXPLANATION -->
 
-                <div class="result-information">
+                <div class="comparison-item">
 
+                    <div class="comparison-title">
 
-                    <!-- ICON -->
+                        <i class="fa-solid fa-fire"></i>
 
-                    <div class="result-icon">
-
-                        <i class="fa-solid fa-leaf"></i>
+                        <h2>
+                            AI Visual Explanation
+                        </h2>
 
                     </div>
 
 
+                    <p class="comparison-description">
 
-                    <!-- LABEL -->
+                        The highlighted regions show areas of
+                        the image that contributed strongly to
+                        the model's prediction.
 
-                    <span class="prediction-label">
-
-                        Detected Condition
-
-                    </span>
-
+                    </p>
 
 
-                    <!-- DISEASE NAME -->
+                    {% if gradcam_filename is defined and gradcam_filename %}
 
-                    <h2 class="disease-name">
+                        <div class="comparison-image">
 
-                        {{ prediction }}
+                            <img
+                                src="{{ url_for(
+                                    'static',
+                                    filename='uploads/' + gradcam_filename
+                                ) }}"
+                                alt="Grad-CAM visual explanation">
 
-                    </h2>
+                        </div>
+
+                    {% else %}
+
+                        <div class="comparison-image comparison-placeholder">
+
+                            <i class="fa-solid fa-image"></i>
+
+                            <p>
+                                AI visual explanation will appear here.
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </section>
 
 
 
-                    <!-- =========================
-                         CONFIDENCE
-                    ========================== -->
+            <!-- =================================================
+                 INFORMATION DASHBOARD
 
-                    <div class="confidence-box">
+                 DESKTOP:
 
-                        <div class="confidence-top">
+                 LEFT SIDE
+                 - Detected Condition
+                 - Confidence Notice
+                 - Symptoms
+                 - Prevention
 
-                            <span>
+                 RIGHT SIDE
+                 - AI Confidence
+                 - About Condition
+                 - Treatment
+                 - Buttons
+                 ================================================= -->
 
+            <section class="information-section">
+
+
+                <!-- =================================================
+                     LEFT COLUMN
+                     ================================================= -->
+
+                <div class="information-left">
+
+
+                    <!-- DETECTED CONDITION -->
+
+                    <section class="information-card detection-card">
+
+                        <div class="section-icon">
+
+                            <i class="fa-solid fa-leaf"></i>
+
+                        </div>
+
+
+                        <div class="section-label">
+                            Detected Condition
+                        </div>
+
+
+                        <h2 class="disease-name">
+
+                            {{disease_info.name}}
+
+                        </h2>
+
+                    </section>
+
+
+
+                    <!-- CONFIDENCE / UNCERTAINTY NOTICE -->
+
+                    {% if is_uncertain is defined and is_uncertain %}
+
+                        <section class="result-notice uncertainty-warning">
+
+                            <div class="notice-icon">
+
+                                <i class="fa-solid fa-circle-exclamation"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <h3>
+                                    Uncertain Prediction
+                                </h3>
+
+                                <p>
+                                    {{ uncertainty_message }}
+                                </p>
+
+                            </div>
+
+                        </section>
+
+
+                    {% elif is_uncertain is defined %}
+
+                        <section class="result-notice confidence-success">
+
+                            <div class="notice-icon">
+
+                                <i class="fa-solid fa-circle-check"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <h3>
+                                    High-Confidence Prediction
+                                </h3>
+
+                                <p>
+                                    The model produced a relatively
+                                    high-confidence prediction for this image.
+                                </p>
+
+                            </div>
+
+                        </section>
+
+                    {% endif %}
+
+
+
+                    <!-- SYMPTOMS -->
+
+                    <section class="information-card">
+
+                        <div class="information-title">
+
+                            <i class="fa-solid fa-notes-medical"></i>
+
+                            <h3>
+                                Symptoms
+                            </h3>
+
+                        </div>
+
+
+                        <ul class="information-list">
+
+                            {% for symptom in symptoms %}
+
+                                <li>
+
+                                    <i class="fa-solid fa-check"></i>
+
+                                    <span>
+                                        {{ symptom }}
+                                    </span>
+
+                                </li>
+
+                            {% endfor %}
+
+                        </ul>
+
+                    </section>
+
+
+
+                    <!-- PREVENTION -->
+
+                    <section class="information-card">
+
+                        <div class="information-title">
+
+                            <i class="fa-solid fa-shield-heart"></i>
+
+                            <h3>
+                                Prevention
+                            </h3>
+
+                        </div>
+
+
+                        <ul class="information-list">
+
+                            {% for item in prevention %}
+
+                                <li>
+
+                                    <i class="fa-solid fa-check"></i>
+
+                                    <span>
+                                        {{ item }}
+                                    </span>
+
+                                </li>
+
+                            {% endfor %}
+
+                        </ul>
+
+                    </section>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     RIGHT COLUMN
+                     ================================================= -->
+
+                <div class="information-right">
+
+
+                    <!-- AI CONFIDENCE -->
+
+                    <section class="information-card confidence-card">
+
+                        <div class="information-title">
+
+                            <i class="fa-solid fa-chart-line"></i>
+
+                            <h3>
                                 AI Confidence
+                            </h3>
 
-                            </span>
+                        </div>
 
+
+                        <div class="confidence-value">
 
                             <strong>
-
                                 {{ "%.2f"|format(confidence) }}%
-
                             </strong>
 
                         </div>
@@ -194,166 +393,83 @@
 
                             <div
                                 class="confidence-progress"
-                                style="--progress: {{ confidence }}%;"
-                            ></div>
+                                style="--progress: {{ confidence }}%;">
+                            </div>
 
                         </div>
 
-                    </div>
+                    </section>
 
 
 
-                    <!-- =========================
-                         DESCRIPTION
-                    ========================== -->
+                    <!-- ABOUT THE CONDITION -->
 
-                    <div class="disease-information">
+                    <section class="information-card">
 
-                        <h3>
+                        <div class="information-title">
 
                             <i class="fa-solid fa-circle-info"></i>
 
-                            About This Condition
+                            <h3>
+                                About This Condition
+                            </h3>
 
-                        </h3>
+                        </div>
 
 
-                        <p>
+                        <p class="condition-description">
 
                             {{ description }}
 
                         </p>
 
-                    </div>
+                    </section>
 
 
 
-                    <!-- =========================
-                         SYMPTOMS
-                    ========================== -->
+                    <!-- TREATMENT -->
 
-                    <div class="result-details">
+                    <section class="information-card">
 
-                        <h3>
-
-                            <i class="fa-solid fa-notes-medical"></i>
-
-                            Symptoms
-
-                        </h3>
-
-
-                        <ul>
-
-                            {% for symptom in symptoms %}
-
-                            <li>
-
-                                <i class="fa-solid fa-check"></i>
-
-                                <span>
-
-                                    {{ symptom }}
-
-                                </span>
-
-                            </li>
-
-                            {% endfor %}
-
-                        </ul>
-
-                    </div>
-
-
-
-                    <!-- =========================
-                         TREATMENT
-                    ========================== -->
-
-                    <div class="result-details">
-
-                        <h3>
+                        <div class="information-title">
 
                             <i class="fa-solid fa-kit-medical"></i>
 
-                            Recommended Treatment
+                            <h3>
+                                Recommended Treatment
+                            </h3>
 
-                        </h3>
+                        </div>
 
 
-                        <ul>
+                        <ul class="information-list">
 
                             {% for item in treatment %}
 
-                            <li>
+                                <li>
 
-                                <i class="fa-solid fa-check"></i>
+                                    <i class="fa-solid fa-check"></i>
 
-                                <span>
+                                    <span>
+                                        {{ item }}
+                                    </span>
 
-                                    {{ item }}
-
-                                </span>
-
-                            </li>
+                                </li>
 
                             {% endfor %}
 
                         </ul>
 
-                    </div>
+                    </section>
 
 
 
-                    <!-- =========================
-                         PREVENTION
-                    ========================== -->
+                    <!-- ACTION BUTTONS -->
 
-                    <div class="result-details">
-
-                        <h3>
-
-                            <i class="fa-solid fa-shield-heart"></i>
-
-                            Prevention
-
-                        </h3>
+                    <section class="result-actions">
 
 
-                        <ul>
-
-                            {% for item in prevention %}
-
-                            <li>
-
-                                <i class="fa-solid fa-check"></i>
-
-                                <span>
-
-                                    {{ item }}
-
-                                </span>
-
-                            </li>
-
-                            {% endfor %}
-
-                        </ul>
-
-                    </div>
-
-
-
-                    <!-- =========================
-                         ACTION BUTTONS
-                    ========================== -->
-
-                    <div class="result-actions">
-
-
-                        <a href="/"
-                           class="result-button secondary">
+                        <a href="/" class="result-button secondary">
 
                             <i class="fa-solid fa-rotate-left"></i>
 
@@ -362,8 +478,7 @@
                         </a>
 
 
-                        <a href="/download"
-                           class="result-button primary">
+                        <a href="/download" class="result-button primary">
 
                             <i class="fa-solid fa-file-pdf"></i>
 
@@ -371,23 +486,25 @@
 
                         </a>
 
-                    </div>
+
+                    </section>
+
 
                 </div>
 
-            </div>
+
+            </section>
 
 
 
-            <!-- =========================
+            <!-- =================================================
                  TOP 3 PREDICTIONS
-            ========================== -->
+                 ================================================= -->
 
             <section class="top3-section">
 
 
                 <div class="top3-heading">
-
 
                     <span class="result-tag">
 
@@ -399,9 +516,7 @@
 
 
                     <h2>
-
                         Top Predictions
-
                     </h2>
 
 
@@ -416,72 +531,56 @@
 
 
 
-                <!-- =========================
-                     TOP 3 GRID
-                ========================== -->
-
                 <div class="top3-grid">
 
 
                     {% for item in top3 %}
 
-
-                    <div class="top3-card">
-
-
-                        <!-- RANK -->
-
-                        <div class="top3-rank">
-
-                            {{ loop.index }}
-
-                        </div>
+                        <div class="top3-card">
 
 
+                            <div class="top3-rank">
 
-                        <!-- CONTENT -->
-
-                        <div class="top3-content">
-
-
-                            <h3>
-
-                                {{ item.name }}
-
-                            </h3>
-
-
-                            <div class="top3-confidence">
-
-                                <span>
-
-                                    Confidence
-
-                                </span>
-
-
-                                <strong>
-
-                                    {{ "%.2f"|format(item.confidence) }}%
-
-                                </strong>
+                                #{{ loop.index }}
 
                             </div>
 
 
-                            <div class="top3-bar">
+                            <div class="top3-content">
 
-                                <div
-                                    class="top3-progress"
-                                    style="--progress: {{ item.confidence }}%;"
-                                ></div>
+                                <h3>
+
+                                    {{ item.name }}
+
+                                </h3>
+
+
+                                <div class="top3-confidence">
+
+                                    <span>
+                                        Confidence
+                                    </span>
+
+                                    <strong>
+                                        {{ "%.2f"|format(item.confidence) }}%
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="top3-bar">
+
+                                    <div
+                                        class="top3-progress"
+                                        style="--progress: {{ item.confidence }}%;">
+                                    </div>
+
+                                </div>
 
                             </div>
 
+
                         </div>
-
-                    </div>
-
 
                     {% endfor %}
 
@@ -492,11 +591,11 @@
 
 
 
-            <!-- =========================
-                 IMPORTANT NOTICE
-            ========================== -->
+            <!-- =================================================
+                 IMPORTANT NOTE
+                 ================================================= -->
 
-            <div class="result-notice">
+            <section class="result-notice important-note">
 
 
                 <div class="notice-icon">
@@ -509,9 +608,7 @@
                 <div>
 
                     <h3>
-
                         Important Note
-
                     </h3>
 
 
@@ -526,7 +623,9 @@
 
                 </div>
 
-            </div>
+
+            </section>
+
 
         </div>
 
@@ -534,12 +633,11 @@
 
 
 
-    <!-- =========================
+    <!-- =====================================================
          FOOTER
-    ========================== -->
+         ===================================================== -->
 
     <footer class="result-footer">
-
 
         <div class="result-footer-content">
 
@@ -549,26 +647,21 @@
                 <i class="fa-solid fa-seedling"></i>
 
                 <span>
-
                     Mvikeli Wezitshalo
-
                 </span>
 
             </div>
 
 
             <p>
-
                 AI-powered tomato plant disease detection.
-
             </p>
 
 
             <small>
-
                 © 2026 Mvikeli Wezitshalo. All rights reserved.
-
             </small>
+
 
         </div>
 

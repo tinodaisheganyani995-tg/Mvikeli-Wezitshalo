@@ -1,2 +1,8 @@
-
 static/uploads/*
+static/reports/*
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+.env
