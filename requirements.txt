@@ -1,11 +1,9 @@
-torch
-torchvision
 Flask==3.1.2
-tensorflow==2.20.0
 numpy==2.3.2
 Pillow==11.3.0
-matplotlib==3.10.6
 scikit-learn
 opencv-python-headless
 gunicorn
 reportlab
+torch
+torchvision
